@@ -21,6 +21,10 @@
 #define PATH_SOCKET "./sockets/"
 #define EXT_SOCKET ".sck" 
 
+/* -------------------------------------------------------------------------- */
+/* Functions                                                                  */
+/* -------------------------------------------------------------------------- */
+
 int main(void) {
     int fd, esito;
     char comunicazione[HMI_INPUT_MSG_LEN];
