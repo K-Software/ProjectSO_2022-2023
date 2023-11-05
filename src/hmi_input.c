@@ -9,12 +9,17 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include "common.h"
+#include "hmi_input.h"
 
 /* -------------------------------------------------------------------------- */
 /* Macro                                                                      */
 /* -------------------------------------------------------------------------- */
 #define PATH_SOCKET "./sockets/"
 #define EXT_SOCKET ".sck"
+
+/* -------------------------------------------------------------------------- */
+/* Functions                                                                  */
+/* -------------------------------------------------------------------------- */
 
 void main() {
     int fd;
@@ -42,9 +47,24 @@ void main() {
 
             printf("Inserisci il comando: ");
             scanf("%s", comando);
-            write(fd, comando, strlen(comando) + 1);
+            if (checkCommand(comando)) {
+                write(fd, comando, strlen(comando) + 1);
+            } else {
+                printf("Comando non valido\n");
+            }
         }
     } while (1);
     close(fd);
     printf("4 - Chiudo il FIFO %s\n", socketName);
+}
+
+int checkCommand(char *command) {
+    if (strcmp(command, HMI_INPUT_COMMAND_START) == 0) {
+        return 1;
+    } else if (strcmp(command, HMI_INPUT_COMMAND_PARKING) == 0) {
+        return 1;
+    } else if (strcmp(command, HMI_INPUT_COMMAND_STOP) == 0) {
+        return 1;
+    }
+    return 0;
 }
