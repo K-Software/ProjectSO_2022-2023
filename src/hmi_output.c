@@ -18,8 +18,6 @@
 /* -------------------------------------------------------------------------- */
 /* Macro                                                                      */
 /* -------------------------------------------------------------------------- */
-#define PATH_SOCKET "./sockets/"
-#define EXT_SOCKET ".sck" 
 
 /* -------------------------------------------------------------------------- */
 /* Functions                                                                  */
@@ -37,7 +35,7 @@ int main(void) {
 
     do {
         printf("2 - Apro il FIFO\n");
-        fd = open(socketName,O_RDONLY);
+        fd = open(socketName,O_RDONLY | O_NONBLOCK);
         if (fd == -1) {
             printf("3 - Errore nell'apertura del FIFO %s\n", socketName);
             sleep(15);
