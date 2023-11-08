@@ -14,14 +14,22 @@
 /* -------------------------------------------------------------------------- */
 /* Macro                                                                      */
 /* -------------------------------------------------------------------------- */
-#define PATH_SOCKET "./sockets/"
-#define EXT_SOCKET ".sck"
 
 /* -------------------------------------------------------------------------- */
 /* Functions                                                                  */
 /* -------------------------------------------------------------------------- */
 
+#ifdef DEBUG
 void main() {
+    if(hmiInputStrat() == 0) {
+        printf("Human-Machine Interface Input started successfully");
+    } else {
+        printf("Human-Machine Interface Input started unsuccessfully");
+    }
+}
+#endif
+
+int hmiInputStrat(void) {
     int fd;
 
     char comando[HMI_INPUT_MSG_LEN];
@@ -38,7 +46,7 @@ void main() {
 
     do {
         // Apertura della named pipe per la scrittura
-        fd = open(socketName, O_WRONLY);
+        fd = open(socketName, O_WRONLY | O_NONBLOCK);
         if (fd == -1) {
             printf("3 - Errore nell'apertura del FIFO %s\n", socketName);
             sleep(15);
