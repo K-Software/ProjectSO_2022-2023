@@ -1,7 +1,7 @@
 /* -------------------------------------------------------------------------- */
 /* common.h                                                                   */
 /* -------------------------------------------------------------------------- */
-#define DEBUGXXX
+#define DEBUG
 #define PATH_SOCKET "./sockets/"
 #define EXT_SOCKET ".sck"
 #define LOG_MSG_WRONG_COMMAND "COMANDO NON PREVISTO"
@@ -40,11 +40,16 @@
 /* Macro - FRONT WISHSHIELD CAMERA                                            */
 /* -------------------------------------------------------------------------- */
 #define FWC_LOG_FILE_NAME "camera"
+#define FWC_DEBUG_FILE_NAME "camera_debug"
+#define FWC_SOCKET "front_windshield_camere"
+#define FWC_MSG_LEN 11
+
 
 /* -------------------------------------------------------------------------- */
 /* Macro - STEER BY WIRE                                                      */
 /* -------------------------------------------------------------------------- */
 #define SBW_LOG_FILE_NAME "steer"
+#define SBW_DEBUG_FILE_NAME "steer_debug"
 #define SBW_SOCKET "steer_by_wire"
 #define SBW_MSG_LEN 10
 #define SBW_TURN_LEFT_LOG_MSG "STO GIRANDO A SINISTRA"
@@ -54,6 +59,7 @@
 /* Macro - THROTTLE CONTROL                                                   */
 /* -------------------------------------------------------------------------- */
 #define TC_LOG_FILE_NAME "throttle"
+#define TC_DEBUG_FILE_NAME "throttle_debug"
 #define TC_SOCKET "throttle_control"
 #define TC_MSG_LEN 13
 #define TC_LOG_MSG "AUMENTO 5"
@@ -62,6 +68,7 @@
 /* Macro - BRAKE BY WIRE                                                      */
 /* -------------------------------------------------------------------------- */
 #define BBW_LOG_FILE_NAME "brake"
+#define BBW_DEBUG_FILE_NAME "brake_debug"
 #define BBW_SOCKET "brake_by_wire"
 #define BBW_MSG_LEN 8
 #define BBW_LOG_MSG "FRENO 5"
