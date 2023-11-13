@@ -20,7 +20,7 @@
 /* Functions                                                                  */
 /* -------------------------------------------------------------------------- */
 
-#ifdef DEBUG
+#ifdef DEBUG_LOG
 int main(int argc, char *argv[])
 {
   if (argc > 1) {
