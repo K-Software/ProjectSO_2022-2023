@@ -18,6 +18,8 @@
 #include "ecu.h"
 #include "front_windshield_camera.h"
 #include "log.h"
+#include "socket_utils.h"
+#include "string_utils.h"
 
 /* -------------------------------------------------------------------------- */
 /* Macro                                                                      */
@@ -29,50 +31,37 @@
 
 int main(void)
 {
-    int speed = 0;
-    int pidHMIInput = 0;
-    int pidFrontWindshieldCamera = 0;
+    ecuStart();
+}
 
+void ecuStart(void)
+{
+    int speed = 0;
+    int pidSteerByWire = 0;
+    int pidThrottleontrol = 0;
+    int pidBrakeByWire = 0;  
+    int pidFrontWindshieldCamera = 0;
 
     pidFrontWindshieldCamera = fork();
     if (pidFrontWindshieldCamera == 0) {
-        printf("Processo FrontWindshieldCamera");
+
+        /* Front Windshield camere */
         frontWindshieldCameraStart();
     } else {
-        printf("Processo ECU");
-        int fd, esito;
-        char comunicazione[HMI_INPUT_MSG_LEN];
 
-        char *socketName = malloc(strlen(PATH_SOCKET)+strlen(HMI_INPUT_SOCKET)+strlen(EXT_SOCKET)+1);
-        strcpy(socketName, PATH_SOCKET);
-        strcat(socketName, HMI_INPUT_SOCKET);
-        strcat(socketName, EXT_SOCKET);
-        printf("1 - FIFO name: %s\n", socketName);
+        /* ECU */
+        char *socketName = malloc(strlen(PATH_SOCKET)+strlen(FWC_SOCKET)+strlen(EXT_SOCKET)+1);
+        buildFWCSocketName(socketName);
 
-        do {
-        printf("2 - Apro il FIFO\n");
-        fd = open(socketName, O_RDONLY | O_NONBLOCK);
-        if (fd == -1) {
-            printf("3 - Errore nell'apertura del FIFO %s\n", socketName);
-            sleep(15);
-        } else {
-            printf("3 - Aperto il FIFO %s\n", socketName);
+        int fd = socketOpenReadMode(socketName);
+        while (1) {
+            char data[FWC_MSG_LEN];
+            socketReadData(fd, socketName, data);
+            printf("Data: %s\n", data);
+            sleep(1);
         }
-        } while (fd == -1);
         
-        while(1) {
-            printf("4 - ");
-            strcpy(comunicazione,"         ");
-            if ((esito = read(fd, comunicazione, sizeof(comunicazione))) != 0) {
-                printf("Comunicazione: %s\n", comunicazione);
-                sleep(1);
-            } else {
-                printf("Nessuna comunicazione\n");
-                sleep(1);
-            }
-        }
-        wait(NULL);
+        socketClose(fd, socketName);
+        free(socketName);
     }
-
-    return 0;
 }
