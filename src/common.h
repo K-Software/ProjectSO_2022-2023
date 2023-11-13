@@ -37,6 +37,7 @@
 /* -------------------------------------------------------------------------- */
 /* Macro - ECU                                                                */
 /* -------------------------------------------------------------------------- */
+#define ECU_LOG_FILE_NAME "ECU"
 #define ECU_COMMAND_LEFT "SINISTRA"
 #define ECU_COMMAND_RIGHT "DESTRA"
 #define ECU_COMMAND_THROTTLE "INCREMENTO 5"
@@ -49,7 +50,10 @@
 #define FWC_DEBUG_FILE_NAME "camera_debug"
 #define FWC_SOCKET "front_windshield_camere"
 #define FWC_MSG_LEN BUFFER_SIZE
-
+#define FWC_COMMAND_LEFT "SINISTRA"
+#define FWC_COMMAND_RIGHT "DESTRA"
+#define FWC_COMMAND_DANGER "PERICOLO"
+#define FWC_COMMAND_PARKING "PARCHEGGIO"
 
 /* -------------------------------------------------------------------------- */
 /* Macro - STEER BY WIRE                                                      */
