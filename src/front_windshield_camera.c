@@ -2,21 +2,29 @@
 /* front_windshield_camera.c                                                  */
 /* -------------------------------------------------------------------------- */
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include <unistd.h>
 #include "common.h"
 #include "front_windshield_camera.h"
 #include "log.h"
+#include "socket_utils.h"
+#include "string_utils.h"
 
 /* -------------------------------------------------------------------------- */
 /* Macro                                                                      */
 /* -------------------------------------------------------------------------- */
 #define DATA_FILE_NAME "./data/frontCamera.data"
+#define OPEN_DATA_FILE_OK "Open file of data"
+#define OPEN_DATA_FILE_ERR "Error during opening file of data"
 
 /* -------------------------------------------------------------------------- */
 /* Functions                                                                  */
 /* -------------------------------------------------------------------------- */
 
-#ifdef DEBUG
+#ifdef DEBUG_FRONT_WINDSHIELD_CAMERA
 int main(void) 
 {
     if (frontWindshieldCameraStart() == 0) {
@@ -37,19 +45,35 @@ int frontWindshieldCameraStart(void)
 
     if (frontCameraData == NULL)
     {
-        printf("Errore nella lettura dei dati");
+        addLog(FWC_DEBUG_FILE_NAME, OPEN_DATA_FILE_ERR);
         return 1;
     }
+    addLog(FWC_DEBUG_FILE_NAME, OPEN_DATA_FILE_OK);
+
+    char *socketName = malloc(strlen(PATH_SOCKET)+strlen(FWC_SOCKET)+strlen(EXT_SOCKET)+1);
+    buildFWCSocketName(socketName);
+
+    mkfifo(socketName, 0666);
 
     // Leggere e stampare il contenuto del file riga per riga
-    char dato[25];  // Una stringa temporanea per leggere ciascuna riga
-    while (fgets(dato, sizeof(dato), frontCameraData) != NULL) {
-        addLog(FWC_LOG_FILE_NAME, dato);
+    char data[FWC_MSG_LEN];  // Una stringa temporanea per leggere ciascuna riga
+    while (fgets(data, sizeof(data), frontCameraData) != NULL) {
+        // Write data in FIFO
+        sendData(socketName, data);
+        addLog(FWC_LOG_FILE_NAME, data);
         sleep(1);
     }
 
     // Chiudere il file dopo aver terminato la lettura
     fclose(frontCameraData);
+    free(socketName);
 
     return 0;
+}
+
+void sendData(char *socketName, char *data)
+{
+    int fd = socketOpenWriteMode(socketName);
+    socketWriteData(fd, socketName, data);
+    socketClose(fd, socketName);
 }
