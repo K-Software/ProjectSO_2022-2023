@@ -15,7 +15,7 @@
 /* Functions                                                                  */
 /* -------------------------------------------------------------------------- */
 
-#ifdef DEBUG
+#ifdef DEBUG_STRING_UTILS
 void main(void) {
     char *socketName = malloc(strlen(PATH_SOCKET)+strlen(HMI_OUTPUT_SOCKET)+strlen(EXT_SOCKET)+1);
     buildHMIOutputSocketName(socketName);
