@@ -15,6 +15,7 @@
 #include "common.h"
 #include "log.h"
 #include "steer_by_wire.h"
+#include "string_utils.h"
 
 /* -------------------------------------------------------------------------- */
 /* Macro                                                                      */
@@ -37,9 +38,7 @@ void steerByWireStart(void)
     char command[SBW_MSG_LEN];
 
     char *socketName = malloc(strlen(PATH_SOCKET)+strlen(SBW_LOG_FILE_NAME)+strlen(EXT_SOCKET)+1);
-    strcpy(socketName, PATH_SOCKET);
-    strcat(socketName, SBW_LOG_FILE_NAME);
-    strcat(socketName, EXT_SOCKET);
+    buildSBWSocketName(socketName);
 
     do {
         addLog(SBW_LOG_FILE_NAME, "Apro il FIFO");
