@@ -1,14 +1,26 @@
 # ---------------------------------------------------------------------------- #
 # ecu.out
 # ---------------------------------------------------------------------------- #
-ecu.out: src/ecu.c front_windshield_camera.o log.o
+ecu.out: src/ecu.c front_windshield_camera.o socket_utils.o log.o string_utils.o
 	cc $^ -o ./bin/$@
 
 # ---------------------------------------------------------------------------- #
 # front_windshield_camera.out
 # ---------------------------------------------------------------------------- #
-front_windshield_camera.o: src/front_windshield_camera.c log.o
+front_windshield_camera.o: src/front_windshield_camera.c socket_utils.o string_utils.o log.o
 	cc -c $^ 
+
+# ---------------------------------------------------------------------------- #
+# socket_utils.o
+# ---------------------------------------------------------------------------- #
+socket_utils.o: src/socket_utils.c log.o
+	cc -c $^
+
+# ---------------------------------------------------------------------------- #
+# string_utils
+# ---------------------------------------------------------------------------- #
+string_utils.o: src/string_utils.c
+	cc -c $^
 
 # ---------------------------------------------------------------------------- #
 # log.o
