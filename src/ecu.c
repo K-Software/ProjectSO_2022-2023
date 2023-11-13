@@ -55,13 +55,38 @@ void ecuStart(void)
 
         int fd = socketOpenReadMode(socketName);
         while (1) {
-            char data[FWC_MSG_LEN];
-            socketReadData(fd, socketName, data);
-            printf("Data: %s\n", data);
+            char command[FWC_MSG_LEN];
+            socketReadData(fd, socketName, command);
+            printf("Data: %s - ", command);
+            addLog(ECU_LOG_FILE_NAME, command);
+            if (strcmp(FWC_COMMAND_LEFT, command) == 0) {
+                printf("Steer by wire: LEFT\n");
+            } else if (strcmp(FWC_COMMAND_RIGHT, command) == 0) {
+                printf("Steer by wire: RIGHT\n");
+            } else if (strcmp(FWC_COMMAND_PARKING, command) == 0) {
+                printf("Parking\n");
+            } else if (strcmp(FWC_COMMAND_DANGER, command) == 0) {
+                printf("!!! DANGER!!!\n");
+            } else {
+                printf("Speed\n");
+            }
+            
             sleep(1);
         }
         
         socketClose(fd, socketName);
         free(socketName);
     }
+}
+
+/*
+ Provare gestire la creazione di tutti i fifo qui 
+*/
+
+void sendDataToSBWComponent(char *command) {
+    char *socketName = malloc(strlen(PATH_SOCKET)+strlen(SBW_SOCKET)+strlen(EXT_SOCKET)+1);
+    buildFWCSocketName(socketName);
+    int fd = socketOpenWriteMode(socketName);
+    socketWriteData(fd, socketName, command);
+    socketClose(fd, socketName);
 }
