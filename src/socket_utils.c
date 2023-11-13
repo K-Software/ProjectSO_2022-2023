@@ -12,7 +12,6 @@
 #include "common.h"
 #include "log.h"
 #include "socket_utils.h"
-#include "string_utils.h"
 
 /* -------------------------------------------------------------------------- */
 /* Macro                                                                      */
@@ -21,9 +20,9 @@
 #define OPEN_W_ERR_MSG "Error during opening in write mode of socket %s"
 #define OPEN_R_OK_MSG "Open socket %s in read mode"
 #define OPEN_R_ERR_MSG "Error during opening in read mode of socket %s"
-#define WRITE_OK_MSG "Writed in socket %s"
+#define WRITE_OK_MSG "Writed in socket %s the data %s"
 #define WRITE_ERR_MSG "Error writing socket %s"
-#define READ_OK_MSG "Read from socket %s"
+#define READ_OK_MSG "Read from socket %s the data %s"
 #define READ_ERR_MSG "Error reading socket %s"
 #define CLOSE_OK_MSG "Close socket %s"
 #define CLOSE_ERR_MSG "Error during closing of socket %s"
@@ -32,7 +31,7 @@
 /* Functions                                                                  */
 /* -------------------------------------------------------------------------- */
 
-#ifdef DEBUG
+#ifdef DEBUG_SOCKET_UTILS
 void main(void) {
 
     char *socketName = malloc(strlen(PATH_SOCKET)+strlen("TEST")+strlen(EXT_SOCKET)+1);
@@ -64,7 +63,7 @@ int socketOpenWriteMode(char *socketName)
     fd = open(socketName, O_WRONLY | O_NONBLOCK);
 
     if (fd == -1) {
-        sprintf(log_msg, OPEN_R_ERR_MSG, socketName);
+        sprintf(log_msg, OPEN_W_ERR_MSG, socketName);
         addLog(SOCKET_UTILS_LOG, log_msg);
         return -1;
     }
@@ -104,7 +103,7 @@ int socketWriteData(int fd, char *socketName, char *data)
         sprintf(log_msg, WRITE_ERR_MSG, socketName);
         return 1;
     } else {
-        sprintf(log_msg, WRITE_OK_MSG, socketName);
+        sprintf(log_msg, WRITE_OK_MSG, socketName, data);
         addLog(SOCKET_UTILS_LOG, log_msg);
     }
     return 0;
@@ -113,16 +112,23 @@ int socketWriteData(int fd, char *socketName, char *data)
 int socketReadData(int fd, char *socketName, char *data)
 {
     char log_msg[MAX_ROW_LEN_LOG];
-
-    ssize_t writedBytes = read(fd, data, strlen(data));
+    ssize_t readBytes;
+    size_t totalBytesRead = 0;
+    do {
+        readBytes = read(fd, data + totalBytesRead, 1);
     
-    if (writedBytes == -1) {
-        sprintf(log_msg, READ_ERR_MSG, socketName);
-        return 1;
-    } else {
-        sprintf(log_msg, READ_OK_MSG, socketName);
-        addLog(SOCKET_UTILS_LOG, log_msg);
-    }
+        if (readBytes == -1) {
+            sprintf(log_msg, READ_ERR_MSG, socketName);
+            return 1;
+        } 
+
+        totalBytesRead += readBytes;
+
+    } while (readBytes > 0 && data[totalBytesRead - 1] != '\0');
+    data[totalBytesRead - 1] = '\0';
+    sprintf(log_msg, READ_OK_MSG, socketName, data);
+    addLog(SOCKET_UTILS_LOG, log_msg);
+    
     return 0;
 }
 
