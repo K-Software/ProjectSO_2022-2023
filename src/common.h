@@ -6,6 +6,7 @@
 #define EXT_SOCKET ".sck"
 #define LOG_MSG_WRONG_COMMAND "COMANDO NON PREVISTO"
 #define LOG_MSG_NO_ACTION "NO ACTION"
+#define BUFFER_SIZE 25
 
 /* -------------------------------------------------------------------------- */
 /* Macro - LOG                                                                */
@@ -22,7 +23,7 @@
 /* Macro - HMI INPUT                                                          */
 /* -------------------------------------------------------------------------- */
 #define HMI_INPUT_SOCKET "hmi_input"
-#define HMI_INPUT_MSG_LEN 10
+#define HMI_INPUT_MSG_LEN BUFFER_SIZE
 #define HMI_INPUT_COMMAND_START "INIZIO"
 #define HMI_INPUT_COMMAND_PARKING "PARCHEGGIO"
 #define HMI_INPUT_COMMAND_STOP "ARRESTO"
@@ -31,7 +32,7 @@
 /* Macro - HMI OUTPUT                                                         */
 /* -------------------------------------------------------------------------- */
 #define HMI_OUTPUT_SOCKET "hmi_output"
-#define HMI_OUTPUT_MSG_LEM 10
+#define HMI_OUTPUT_MSG_LEM BUFFER_SIZE
 
 /* -------------------------------------------------------------------------- */
 /* Macro - ECU                                                                */
@@ -47,7 +48,7 @@
 #define FWC_LOG_FILE_NAME "camera"
 #define FWC_DEBUG_FILE_NAME "camera_debug"
 #define FWC_SOCKET "front_windshield_camere"
-#define FWC_MSG_LEN 11
+#define FWC_MSG_LEN BUFFER_SIZE
 
 
 /* -------------------------------------------------------------------------- */
@@ -56,7 +57,7 @@
 #define SBW_LOG_FILE_NAME "steer"
 #define SBW_DEBUG_FILE_NAME "steer_debug"
 #define SBW_SOCKET "steer_by_wire"
-#define SBW_MSG_LEN 10
+#define SBW_MSG_LEN BUFFER_SIZE
 #define SBW_TURN_LEFT_LOG_MSG "STO GIRANDO A SINISTRA"
 #define SBW_TURN_RIGHT_LOG_MSG "STO GIRANDO A DESTRA"
 
@@ -66,7 +67,7 @@
 #define TC_LOG_FILE_NAME "throttle"
 #define TC_DEBUG_FILE_NAME "throttle_debug"
 #define TC_SOCKET "throttle_control"
-#define TC_MSG_LEN 13
+#define TC_MSG_LEN BUFFER_SIZE
 #define TC_LOG_MSG "AUMENTO 5"
 
 /* -------------------------------------------------------------------------- */
@@ -75,5 +76,5 @@
 #define BBW_LOG_FILE_NAME "brake"
 #define BBW_DEBUG_FILE_NAME "brake_debug"
 #define BBW_SOCKET "brake_by_wire"
-#define BBW_MSG_LEN 8
+#define BBW_MSG_LEN BUFFER_SIZE
 #define BBW_LOG_MSG "FRENO 5"
