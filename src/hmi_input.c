@@ -63,6 +63,7 @@ int hmiInputStrat(void) {
         }
     } while (1);
     close(fd);
+    free(socketName);
     printf("4 - Chiudo il FIFO %s\n", socketName);
 }
 

@@ -14,54 +14,47 @@
 #include <unistd.h>
 #include "common.h"
 #include "log.h"
+#include "socket_utils.h"
 #include "steer_by_wire.h"
 #include "string_utils.h"
 
 /* -------------------------------------------------------------------------- */
 /* Macro                                                                      */
 /* -------------------------------------------------------------------------- */
+#define PROCESS_NAME "STEER BY WIRE"
 
 /* -------------------------------------------------------------------------- */
 /* Functions                                                                  */
 /* -------------------------------------------------------------------------- */
 
-#ifdef DEBUG
 void main(void)
 {
     steerByWireStart();
 } 
-#endif
 
 void steerByWireStart(void) 
 {
-    int fd, esito;
-    char command[SBW_MSG_LEN];
-
-    char *socketName = malloc(strlen(PATH_SOCKET)+strlen(SBW_LOG_FILE_NAME)+strlen(EXT_SOCKET)+1);
+    char *socketName = malloc(strlen(PATH_SOCKET)+strlen(SBW_SOCKET)+strlen(EXT_SOCKET)+1);
     buildSBWSocketName(socketName);
 
-    do {
-        addLog(SBW_LOG_FILE_NAME, "Apro il FIFO");
-        fd = open(socketName,O_RDONLY | O_NONBLOCK);
-        if (fd == -1) {
-            addLog(SBW_LOG_FILE_NAME, "Errore nell'apertura del FIFO");
-            sleep(15);
-        } else {
-            addLog(SBW_LOG_FILE_NAME, "Aperto il FIFO");
-        }
-    } while (fd == -1);
-    free(socketName);
-
+    int fd = socketOpenReadMode(PROCESS_NAME, socketName);
     while(1) {
-        if ((esito = read(fd, command, sizeof(command))) != 0) {
+        char log_msg[MAX_ROW_LEN_LOG];
+        char command[SBW_MSG_LEN] = "";
+        socketReadData(PROCESS_NAME, fd, socketName, command);
+        sprintf(log_msg, "lunghezza command: %ld", strlen(command));
+        addLog(SBW_LOG_FILE_NAME, log_msg);
+        if (strlen(command) != 0) {
             if (strcmp(command, ECU_COMMAND_RIGHT) == 0) {
                 addLog(SBW_LOG_FILE_NAME, SBW_TURN_RIGHT_LOG_MSG);
+                sleep(4);
             } else if (strcmp(command, ECU_COMMAND_LEFT) == 0) {
                 addLog(SBW_LOG_FILE_NAME, SBW_TURN_LEFT_LOG_MSG);
+                sleep(4);
             } else {
                 addLog(SBW_LOG_FILE_NAME, LOG_MSG_WRONG_COMMAND);
+                sleep(1);
             }
-            sleep(4);
         } else {
             addLog(SBW_LOG_FILE_NAME, LOG_MSG_NO_ACTION);
             sleep(1);

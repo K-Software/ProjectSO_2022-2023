@@ -16,16 +16,16 @@
 /* -------------------------------------------------------------------------- */
 /* Macro                                                                      */
 /* -------------------------------------------------------------------------- */
-#define OPEN_W_OK_MSG "Open socket %s in write mode"
-#define OPEN_W_ERR_MSG "Error during opening in write mode of socket %s"
-#define OPEN_R_OK_MSG "Open socket %s in read mode"
-#define OPEN_R_ERR_MSG "Error during opening in read mode of socket %s"
-#define WRITE_OK_MSG "Writed in socket %s the data %s"
-#define WRITE_ERR_MSG "Error writing socket %s"
-#define READ_OK_MSG "Read from socket %s the data %s"
-#define READ_ERR_MSG "Error reading socket %s"
-#define CLOSE_OK_MSG "Close socket %s"
-#define CLOSE_ERR_MSG "Error during closing of socket %s"
+#define OPEN_W_OK_MSG "%s - Open socket %s in write mode"
+#define OPEN_W_ERR_MSG "%s - Error during opening in write mode of socket %s (errno=%d)"
+#define OPEN_R_OK_MSG "%s - Open socket %s in read mode"
+#define OPEN_R_ERR_MSG "%s - Error during opening in read mode of socket %s (errno=%d)"
+#define WRITE_OK_MSG "%s - Writed in socket %s the data %s"
+#define WRITE_ERR_MSG "%s - Error writing socket %s (errno=%d)"
+#define READ_OK_MSG "%s - Read from socket %s the data %s"
+#define READ_ERR_MSG "%s - Error reading socket %s (errno=%d)"
+#define CLOSE_OK_MSG "%s - Close socket %s"
+#define CLOSE_ERR_MSG "%s - Error during closing of socket %s (errno=%d)"
 
 /* -------------------------------------------------------------------------- */
 /* Functions                                                                  */
@@ -54,8 +54,9 @@ void main(void) {
 #endif
 
 /*
+ *
  */
-int socketOpenWriteMode(char *socketName) 
+int socketOpenWriteMode(char *processName, char *socketName) 
 {
     int fd;
     char log_msg[MAX_ROW_LEN_LOG];
@@ -63,18 +64,19 @@ int socketOpenWriteMode(char *socketName)
     fd = open(socketName, O_WRONLY | O_NONBLOCK);
 
     if (fd == -1) {
-        sprintf(log_msg, OPEN_W_ERR_MSG, socketName);
+        sprintf(log_msg, OPEN_W_ERR_MSG, processName, socketName, errno);
         addLog(SOCKET_UTILS_LOG, log_msg);
         return -1;
     }
-    sprintf(log_msg, OPEN_W_OK_MSG, socketName);
+    sprintf(log_msg, OPEN_W_OK_MSG, processName, socketName);
     addLog(SOCKET_UTILS_LOG, log_msg);
     return fd;
 }
 
 /*
+ *
  */
-int socketOpenReadMode(char *socketName)
+int socketOpenReadMode(char *processName, char *socketName)
 {
     int fd;
     char log_msg[MAX_ROW_LEN_LOG];
@@ -82,34 +84,38 @@ int socketOpenReadMode(char *socketName)
     fd = open(socketName, O_RDONLY | O_NONBLOCK);
 
     if (fd == -1) {
-        sprintf(log_msg, OPEN_R_ERR_MSG, socketName);
+        sprintf(log_msg, OPEN_R_ERR_MSG, processName, socketName, errno);
         addLog(SOCKET_UTILS_LOG, log_msg);
         return -1;
     }
-    sprintf(log_msg, OPEN_R_OK_MSG, socketName);
+    sprintf(log_msg, OPEN_R_OK_MSG, processName, socketName);
     addLog(SOCKET_UTILS_LOG, log_msg);
     return fd;
 }
 
 /*
+ *
  */
-int socketWriteData(int fd, char *socketName, char *data) 
+int socketWriteData(char *processName, int fd, char *socketName, char *data) 
 {
     char log_msg[MAX_ROW_LEN_LOG];
 
     ssize_t writedBytes = write(fd, data, strlen(data));
     
     if (writedBytes == -1) {
-        sprintf(log_msg, WRITE_ERR_MSG, socketName);
-        return 1;
-    } else {
-        sprintf(log_msg, WRITE_OK_MSG, socketName, data);
+        sprintf(log_msg, WRITE_ERR_MSG, processName, socketName, errno);
         addLog(SOCKET_UTILS_LOG, log_msg);
-    }
+        return 1;
+    } 
+    sprintf(log_msg, WRITE_OK_MSG, processName, socketName, data);
+    addLog(SOCKET_UTILS_LOG, log_msg);
     return 0;
 }
 
-int socketReadData(int fd, char *socketName, char *data)
+/*
+ *
+ */
+int socketReadData(char *processName, int fd, char *socketName, char *data)
 {
     char log_msg[MAX_ROW_LEN_LOG];
     ssize_t readBytes;
@@ -118,7 +124,7 @@ int socketReadData(int fd, char *socketName, char *data)
         readBytes = read(fd, data + totalBytesRead, 1);
     
         if (readBytes == -1) {
-            sprintf(log_msg, READ_ERR_MSG, socketName);
+            sprintf(log_msg, READ_ERR_MSG, processName, socketName, errno);
             return 1;
         } 
 
@@ -126,25 +132,26 @@ int socketReadData(int fd, char *socketName, char *data)
 
     } while (readBytes > 0 && data[totalBytesRead - 1] != '\0');
     data[totalBytesRead - 1] = '\0';
-    sprintf(log_msg, READ_OK_MSG, socketName, data);
+    sprintf(log_msg, READ_OK_MSG, processName, socketName, data);
     addLog(SOCKET_UTILS_LOG, log_msg);
     
     return 0;
 }
 
 /*
+ *
  */
-int socketClose(int fd, char *socketName)
+int socketClose(char *processName, int fd, char *socketName)
 {
     char log_msg[MAX_ROW_LEN_LOG];
     int res = close(fd);
     
     if (res == -1) {
-        sprintf(log_msg, CLOSE_ERR_MSG, socketName);
+        sprintf(log_msg, CLOSE_ERR_MSG, processName, socketName, errno);
         addLog(SOCKET_UTILS_LOG, log_msg);
         return 1;
     }
-    sprintf(log_msg, CLOSE_OK_MSG, socketName);
+    sprintf(log_msg, CLOSE_OK_MSG, processName, socketName);
     addLog(SOCKET_UTILS_LOG, log_msg);
     return 0;
 }

@@ -16,6 +16,7 @@
 /* -------------------------------------------------------------------------- */
 /* Macro                                                                      */
 /* -------------------------------------------------------------------------- */
+#define PROCESS_NAME "FRONT WINDSHIELD CAMERA"
 #define DATA_FILE_NAME "./data/frontCamera.data"
 #define OPEN_DATA_FILE_OK "Open file of data"
 #define OPEN_DATA_FILE_ERR "Error during opening file of data"
@@ -24,16 +25,10 @@
 /* Functions                                                                  */
 /* -------------------------------------------------------------------------- */
 
-#ifdef DEBUG_FRONT_WINDSHIELD_CAMERA
 int main(void) 
 {
-    if (frontWindshieldCameraStart() == 0) {
-        printf("Front windshield camera started successfully");
-    } else {
-        printf("Front windshield camera started unsuccessfully");
-    }
+    frontWindshieldCameraStart();
 }
-#endif
 
 int frontWindshieldCameraStart(void) 
 {
@@ -53,7 +48,7 @@ int frontWindshieldCameraStart(void)
     char *socketName = malloc(strlen(PATH_SOCKET)+strlen(FWC_SOCKET)+strlen(EXT_SOCKET)+1);
     buildFWCSocketName(socketName);
 
-    mkfifo(socketName, 0666);
+    // mkfifo(socketName, 0666);
 
     // Leggere e stampare il contenuto del file riga per riga
     char data[FWC_MSG_LEN];  // Una stringa temporanea per leggere ciascuna riga
@@ -73,7 +68,7 @@ int frontWindshieldCameraStart(void)
 
 void sendData(char *socketName, char *data)
 {
-    int fd = socketOpenWriteMode(socketName);
-    socketWriteData(fd, socketName, data);
-    socketClose(fd, socketName);
+    int fd = socketOpenWriteMode(PROCESS_NAME, socketName);
+    socketWriteData(PROCESS_NAME, fd, socketName, data);
+    socketClose(PROCESS_NAME, fd, socketName);
 }

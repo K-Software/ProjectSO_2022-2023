@@ -14,6 +14,7 @@
 #include <unistd.h>
 #include "common.h"
 #include "hmi_output.h"
+#include "string_utils.h"
 
 /* -------------------------------------------------------------------------- */
 /* Macro                                                                      */
@@ -28,9 +29,7 @@ int main(void) {
     char comunicazione[HMI_INPUT_MSG_LEN];
 
     char *socketName = malloc(strlen(PATH_SOCKET)+strlen(HMI_OUTPUT_SOCKET)+strlen(EXT_SOCKET)+1);
-    strcpy(socketName, PATH_SOCKET);
-    strcat(socketName, HMI_OUTPUT_SOCKET);
-    strcat(socketName, EXT_SOCKET);
+    buildHMIOutputSocketName(socketName);
     printf("1 - FIFO name: %s\n", socketName);
 
     do {

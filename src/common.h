@@ -37,7 +37,8 @@
 /* -------------------------------------------------------------------------- */
 /* Macro - ECU                                                                */
 /* -------------------------------------------------------------------------- */
-#define ECU_LOG_FILE_NAME "ECU"
+#define ECU_LOG_FILE_NAME "ecu"
+#define ECU_DEBUG_FILE_NAME "ecu_debug"
 #define ECU_COMMAND_LEFT "SINISTRA"
 #define ECU_COMMAND_RIGHT "DESTRA"
 #define ECU_COMMAND_THROTTLE "INCREMENTO 5"
