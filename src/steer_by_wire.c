@@ -42,8 +42,6 @@ void steerByWireStart(void)
         char log_msg[MAX_ROW_LEN_LOG];
         char command[SBW_MSG_LEN] = "";
         socketReadData(PROCESS_NAME, fd, socketName, command);
-        sprintf(log_msg, "lunghezza command: %ld", strlen(command));
-        addLog(SBW_LOG_FILE_NAME, log_msg);
         if (strlen(command) != 0) {
             if (strcmp(command, ECU_COMMAND_RIGHT) == 0) {
                 addLog(SBW_LOG_FILE_NAME, SBW_TURN_RIGHT_LOG_MSG);
@@ -52,7 +50,8 @@ void steerByWireStart(void)
                 addLog(SBW_LOG_FILE_NAME, SBW_TURN_LEFT_LOG_MSG);
                 sleep(4);
             } else {
-                addLog(SBW_LOG_FILE_NAME, LOG_MSG_WRONG_COMMAND);
+                sprintf(log_msg, LOG_MSG_WRONG_COMMAND, command);
+                addLog(SBW_LOG_FILE_NAME, log_msg);
                 sleep(1);
             }
         } else {
@@ -60,4 +59,5 @@ void steerByWireStart(void)
             sleep(1);
         }
     }
+
 }

@@ -122,7 +122,7 @@ int socketReadData(char *processName, int fd, char *socketName, char *data)
     size_t totalBytesRead = 0;
     do {
         readBytes = read(fd, data + totalBytesRead, 1);
-    
+
         if (readBytes == -1) {
             sprintf(log_msg, READ_ERR_MSG, processName, socketName, errno);
             return 1;
@@ -133,8 +133,7 @@ int socketReadData(char *processName, int fd, char *socketName, char *data)
     } while (readBytes > 0 && data[totalBytesRead - 1] != '\0');
     data[totalBytesRead - 1] = '\0';
     sprintf(log_msg, READ_OK_MSG, processName, socketName, data);
-    addLog(SOCKET_UTILS_LOG, log_msg);
-    
+    addLog(SOCKET_UTILS_LOG, log_msg);    
     return 0;
 }
 

@@ -72,20 +72,23 @@ void ecuStart(void)
     }    
 
     /* ECU */
-    char *socketName = malloc(strlen(PATH_SOCKET)+strlen(FWC_SOCKET)+strlen(EXT_SOCKET)+1);
-    buildFWCSocketName(socketName);
+    char *socketFWC = malloc(strlen(PATH_SOCKET)+strlen(FWC_SOCKET)+strlen(EXT_SOCKET)+1);
+    buildFWCSocketName(socketFWC);
 
-    int fd = socketOpenReadMode(PROCESS_NAME, socketName);
+    char *socketSBW = malloc(strlen(PATH_SOCKET)+strlen(SBW_SOCKET)+strlen(EXT_SOCKET)+1);
+    buildSBWSocketName(socketSBW);
+
+    int fd = socketOpenReadMode(PROCESS_NAME, socketFWC);
     while (1) {
         char command[FWC_MSG_LEN] = "";
-        socketReadData(PROCESS_NAME, fd, socketName, command);
+        socketReadData(PROCESS_NAME, fd, socketFWC, command);
         printf("Data: %s - ", command);
         addLog(ECU_LOG_FILE_NAME, command);
         if (strcmp(FWC_COMMAND_LEFT, command) == 0) {
-            sendDataToSBWComponent(ECU_COMMAND_LEFT);
+            sendDataToSBWComponent(socketSBW, ECU_COMMAND_LEFT);
             printf("Steer by wire: LEFT\n");
         } else if (strcmp(FWC_COMMAND_RIGHT, command) == 0) {
-            sendDataToSBWComponent(ECU_COMMAND_RIGHT);
+            sendDataToSBWComponent(socketSBW, ECU_COMMAND_RIGHT);
             printf("Steer by wire: RIGHT\n");
         } else if (strcmp(FWC_COMMAND_PARKING, command) == 0) {
             printf("Parking\n");
@@ -97,8 +100,9 @@ void ecuStart(void)
         sleep(1);
     }
     
-    socketClose(PROCESS_NAME, fd, socketName);
-    free(socketName);
+    socketClose(PROCESS_NAME, fd, socketFWC);
+    free(socketSBW);
+    free(socketFWC);
 }
 
 /*
@@ -122,11 +126,9 @@ void initSockets(void)
     free(socketSBW);
 }
 
-void sendDataToSBWComponent(char *command) 
+void sendDataToSBWComponent(char *socketName, char *command) 
 {
-    char *socketSBW = malloc(strlen(PATH_SOCKET)+strlen(SBW_SOCKET)+strlen(EXT_SOCKET)+1);
-    buildSBWSocketName(socketSBW);
-    int fd = socketOpenWriteMode(PROCESS_NAME, socketSBW);
-    socketWriteData(PROCESS_NAME, fd, socketSBW, command);
-    socketClose(PROCESS_NAME, fd, socketSBW);
+    int fd = socketOpenWriteMode(PROCESS_NAME, socketName);
+    socketWriteData(PROCESS_NAME, fd, socketName, command);
+    //socketClose(PROCESS_NAME, fd, socketName);
 }
