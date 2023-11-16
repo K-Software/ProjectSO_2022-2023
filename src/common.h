@@ -4,7 +4,7 @@
 #define DEBUG
 #define PATH_SOCKET "./sockets/"
 #define EXT_SOCKET ".sck"
-#define LOG_MSG_WRONG_COMMAND "COMANDO NON PREVISTO"
+#define LOG_MSG_WRONG_COMMAND "COMANDO NON PREVISTO: %s"
 #define LOG_MSG_NO_ACTION "NO ACTION"
 #define BUFFER_SIZE 25
 
