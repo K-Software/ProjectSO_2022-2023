@@ -46,10 +46,13 @@ void ecuStart(void)
 
     initSockets();
 
-    const char *paths[] = {"/repo_elaborato/bin/front_windshield_camera.out", "/repo_elaborato/bin/steer_by_wire.out"};
-    const char *components[] = {"front_windshield_camera.out", "steer_by_wire.out"};
+    const char *paths[] = {"/repo_elaborato/bin/front_windshield_camera.out", 
+        "/repo_elaborato/bin/steer_by_wire.out",
+        "/repo_elaborato/bin/throttle_control.out"};
+    const char *components[] = {"front_windshield_camera.out", "steer_by_wire.out",
+        "throttle_control.out"};
 
-    for (int i = 0; i < 2; ++i) {
+    for (int i = 0; i < 3; ++i) {
         char log_msg[MAX_ROW_LEN_LOG];
         pid_t childPid = fork();
 
@@ -78,6 +81,9 @@ void ecuStart(void)
     char *socketSBW = malloc(strlen(PATH_SOCKET)+strlen(SBW_SOCKET)+strlen(EXT_SOCKET)+1);
     buildSBWSocketName(socketSBW);
 
+    char *socketTC = malloc(strlen(PATH_SOCKET)+strlen(TC_SOCKET)+strlen(EXT_SOCKET)+1);
+    buildTCSocketName(socketTC);
+
     int fd = socketOpenReadMode(PROCESS_NAME, socketFWC);
     while (1) {
         char command[FWC_MSG_LEN] = "";
@@ -86,16 +92,28 @@ void ecuStart(void)
         addLog(ECU_LOG_FILE_NAME, command);
         if (strcmp(FWC_COMMAND_LEFT, command) == 0) {
             sendDataToSBWComponent(socketSBW, ECU_COMMAND_LEFT);
-            printf("Steer by wire: LEFT\n");
+            printf("\n");
         } else if (strcmp(FWC_COMMAND_RIGHT, command) == 0) {
             sendDataToSBWComponent(socketSBW, ECU_COMMAND_RIGHT);
-            printf("Steer by wire: RIGHT\n");
+            printf("\n");
         } else if (strcmp(FWC_COMMAND_PARKING, command) == 0) {
             printf("Parking\n");
         } else if (strcmp(FWC_COMMAND_DANGER, command) == 0) {
             printf("!!! DANGER!!!\n");
         } else {
-            printf("Speed\n");
+            printf("Speed: %d \n", speed);
+            int temp = atoi(command);
+            if (temp > speed) {
+                for (; speed < temp; speed += 5) {
+                    sendDataToTCComponent(socketTC);
+                    printf("%s\n", ECU_COMMAND_THROTTLE);
+                }
+            } else if (speed > temp) {
+                for (; speed > temp; speed -= 5) {
+                    printf("%s\n", ECU_COMMAND_BRAKE);
+                }
+            }
+            
         }
         sleep(1);
     }
@@ -124,6 +142,13 @@ void initSockets(void)
     buildSBWSocketName(socketSBW);
     mkfifo(socketSBW, 0666);
     free(socketSBW);
+
+    // Throttle control
+    printf("-- 3 --\n");
+    char *socketTC = malloc(strlen(PATH_SOCKET)+strlen(TC_SOCKET)+strlen(EXT_SOCKET)+1);
+    buildTCSocketName(socketTC);
+    mkfifo(socketTC, 0666);
+    free(socketTC);
 }
 
 void sendDataToSBWComponent(char *socketName, char *command) 
@@ -132,3 +157,10 @@ void sendDataToSBWComponent(char *socketName, char *command)
     socketWriteData(PROCESS_NAME, fd, socketName, command);
     //socketClose(PROCESS_NAME, fd, socketName);
 }
+
+void sendDataToTCComponent(char *socketName) 
+{
+    int fd = socketOpenWriteMode(PROCESS_NAME, socketName);
+    socketWriteData(PROCESS_NAME, fd, socketName, ECU_COMMAND_THROTTLE);
+}
+
