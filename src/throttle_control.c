@@ -14,56 +14,40 @@
 #include <unistd.h>
 #include "common.h"
 #include "log.h"
+#include "socket_utils.h"
+#include "string_utils.h"
 #include "throttle_control.h"
 
 /* -------------------------------------------------------------------------- */
 /* Macro                                                                      */
 /* -------------------------------------------------------------------------- */
+#define PROCESS_NAME "THROTTLE CONTROL"
 
 /* -------------------------------------------------------------------------- */
 /* Functions                                                                  */
 /* -------------------------------------------------------------------------- */
 
-#ifdef DEBUG
 void main(void)
 {
     throttleControlStart();
 } 
-#endif
 
 void throttleControlStart(void) 
 {
-    int fd, esito;
-    char command[TC_MSG_LEN];
+    char *socketName = malloc(strlen(PATH_SOCKET)+strlen(TC_SOCKET)+strlen(EXT_SOCKET)+1);
+    buildTCSocketName(socketName);
 
-    char *socketName = malloc(strlen(PATH_SOCKET)+strlen(TC_LOG_FILE_NAME)+strlen(EXT_SOCKET)+1);
-    strcpy(socketName, PATH_SOCKET);
-    strcat(socketName, TC_LOG_FILE_NAME);
-    strcat(socketName, EXT_SOCKET);
-
-    do {
-        addLog(TC_LOG_FILE_NAME, "Apro il FIFO");
-        fd = open(socketName,O_RDONLY | O_NONBLOCK);
-        if (fd == -1) {
-            addLog(TC_LOG_FILE_NAME, "Errore nell'apertura del FIFO");
-            sleep(15);
-        } else {
-            addLog(TC_LOG_FILE_NAME, "Aperto il FIFO");
-        }
-    } while (fd == -1);
-    free(socketName);
-
+    int fd = socketOpenReadMode(PROCESS_NAME, socketName);
     while(1) {
-        if ((esito = read(fd, command, sizeof(command))) != 0) {
+        char log_msg[MAX_ROW_LEN_LOG];
+        char command[TC_MSG_LEN] = "";
+        socketReadData(PROCESS_NAME, fd, socketName, command);
+        if (strlen(command) != 0) {
             if (strcmp(command, ECU_COMMAND_THROTTLE) == 0) {
                 addLog(TC_LOG_FILE_NAME, TC_LOG_MSG);
             } else {
                 addLog(TC_LOG_FILE_NAME, LOG_MSG_WRONG_COMMAND);
             }
-            sleep(1);
-        } else {
-            addLog(TC_LOG_FILE_NAME, LOG_MSG_NO_ACTION);
-            sleep(1);
-        }
+        } 
     }    
 }
