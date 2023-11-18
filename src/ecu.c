@@ -38,21 +38,19 @@ int main(void)
 
 void ecuStart(void)
 {
+    char prevCommand[FWC_MSG_LEN] = "";
     int speed = 0;
-    int pidSteerByWire = 0;
-    int pidThrottleontrol = 0;
-    int pidBrakeByWire = 0;  
-    int pidFrontWindshieldCamera = 0;
 
     initSockets();
 
     const char *paths[] = {"/repo_elaborato/bin/front_windshield_camera.out", 
         "/repo_elaborato/bin/steer_by_wire.out",
-        "/repo_elaborato/bin/throttle_control.out"};
+        "/repo_elaborato/bin/throttle_control.out",
+        "/repo_elaborato/bin/brake_by_wire.out"};
     const char *components[] = {"front_windshield_camera.out", "steer_by_wire.out",
-        "throttle_control.out"};
+        "throttle_control.out", "brake_by_wire.out"};
 
-    for (int i = 0; i < 3; ++i) {
+    for (int i = 0; i < 4; ++i) {
         char log_msg[MAX_ROW_LEN_LOG];
         pid_t childPid = fork();
 
@@ -84,10 +82,25 @@ void ecuStart(void)
     char *socketTC = malloc(strlen(PATH_SOCKET)+strlen(TC_SOCKET)+strlen(EXT_SOCKET)+1);
     buildTCSocketName(socketTC);
 
+    char *socketBBW = malloc(strlen(PATH_SOCKET)+strlen(BBW_SOCKET)+strlen(EXT_SOCKET)+1);
+    buildBBWSocketName(socketBBW);
+
     int fd = socketOpenReadMode(PROCESS_NAME, socketFWC);
     while (1) {
         char command[FWC_MSG_LEN] = "";
         socketReadData(PROCESS_NAME, fd, socketFWC, command);
+
+        // Parser commando
+        if (strlen(command) == 0) {
+            continue;
+        }
+        char *posizione = strstr(command, "\n");
+        if (posizione != NULL) {
+            int indice = posizione - command;
+            strcpy(prevCommand, command);
+            getSubStr(prevCommand, command, 0, indice - 1);
+        }
+
         printf("Data: %s - ", command);
         addLog(ECU_LOG_FILE_NAME, command);
         if (strcmp(FWC_COMMAND_LEFT, command) == 0) {
@@ -98,8 +111,9 @@ void ecuStart(void)
             printf("\n");
         } else if (strcmp(FWC_COMMAND_PARKING, command) == 0) {
             printf("Parking\n");
+            parking(socketBBW, &speed);
         } else if (strcmp(FWC_COMMAND_DANGER, command) == 0) {
-            printf("!!! DANGER!!!\n");
+            printf("!!! DANGER !!!\n");
         } else {
             printf("Speed: %d \n", speed);
             int temp = atoi(command);
@@ -110,15 +124,21 @@ void ecuStart(void)
                 }
             } else if (speed > temp) {
                 for (; speed > temp; speed -= 5) {
+                    sendDataToBBWComponent(socketBBW);
                     printf("%s\n", ECU_COMMAND_BRAKE);
                 }
             }
             
         }
+        if (strlen(command) > 0) {
+            strcpy(prevCommand, command);
+        }
         sleep(1);
     }
     
     socketClose(PROCESS_NAME, fd, socketFWC);
+    free(socketBBW);
+    free(socketTC);
     free(socketSBW);
     free(socketFWC);
 }
@@ -149,18 +169,41 @@ void initSockets(void)
     buildTCSocketName(socketTC);
     mkfifo(socketTC, 0666);
     free(socketTC);
+
+    // Brake by wire
+    printf("-- 4 --\n");
+    char *socketBBW = malloc(strlen(PATH_SOCKET)+strlen(BBW_SOCKET)+strlen(EXT_SOCKET)+1);
+    buildBBWSocketName(socketBBW);
+    mkfifo(socketBBW, 0666);
+    free(socketBBW); 
 }
 
 void sendDataToSBWComponent(char *socketName, char *command) 
 {
     int fd = socketOpenWriteMode(PROCESS_NAME, socketName);
     socketWriteData(PROCESS_NAME, fd, socketName, command);
-    //socketClose(PROCESS_NAME, fd, socketName);
 }
 
 void sendDataToTCComponent(char *socketName) 
 {
     int fd = socketOpenWriteMode(PROCESS_NAME, socketName);
     socketWriteData(PROCESS_NAME, fd, socketName, ECU_COMMAND_THROTTLE);
+}
+
+void sendDataToBBWComponent(char *socketName)
+{
+    int fd = socketOpenWriteMode(PROCESS_NAME, socketName);
+    socketWriteData(PROCESS_NAME, fd, socketName, ECU_COMMAND_BRAKE);
+}
+
+void parking(char *socketName, int *speed) {
+    for (; *speed > 0; *speed -= 5) {
+        sendDataToBBWComponent(socketName);
+        printf("%s - speed: %d\n", ECU_COMMAND_BRAKE, *speed);
+        sleep(1);
+    }
+    // TODO: call Parking component
+    printf("Wait 30s\n");
+    sleep(30);   
 }
 
