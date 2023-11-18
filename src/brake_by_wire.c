@@ -15,54 +15,39 @@
 #include "common.h"
 #include "log.h"
 #include "brake_by_wire.h"
+#include "socket_utils.h"
+#include "string_utils.h"
 
 /* -------------------------------------------------------------------------- */
 /* Macro                                                                      */
 /* -------------------------------------------------------------------------- */
+#define PROCESS_NAME "BRAKE BY WIRE"
 
 /* -------------------------------------------------------------------------- */
 /* Functions                                                                  */
 /* -------------------------------------------------------------------------- */
 
-#ifdef DEBUG
 void main(void)
 {
     brakeByWireStart();
 } 
-#endif
 
-void brakeByWireStart(void) {
-    int fd, esito;
-    char command[BBW_MSG_LEN];
+void brakeByWireStart(void) 
+{
+    char *socketName = malloc(strlen(PATH_SOCKET)+strlen(BBW_SOCKET)+strlen(EXT_SOCKET)+1);
+    buildBBWSocketName(socketName);
 
-    char *socketName = malloc(strlen(PATH_SOCKET)+strlen(BBW_LOG_FILE_NAME)+strlen(EXT_SOCKET)+1);
-    strcpy(socketName, PATH_SOCKET);
-    strcat(socketName, BBW_LOG_FILE_NAME);
-    strcat(socketName, EXT_SOCKET);
-
-    do {
-        addLog(BBW_LOG_FILE_NAME, "Apro il FIFO");
-        fd = open(socketName,O_RDONLY | O_NONBLOCK);
-        if (fd == -1) {
-            addLog(BBW_LOG_FILE_NAME, "Errore nell'apertura del FIFO");
-            sleep(15);
-        } else {
-            addLog(BBW_LOG_FILE_NAME, "Aperto il FIFO");
-        }
-    } while (fd == -1);
-    free(socketName);
-
+    int fd = socketOpenReadMode(PROCESS_NAME, socketName);
     while(1) {
-        if ((esito = read(fd, command, sizeof(command))) != 0) {
+        char log_msg[MAX_ROW_LEN_LOG];
+        char command[BBW_MSG_LEN] = "";
+        socketReadData(PROCESS_NAME, fd, socketName, command);
+        if (strlen(command) != 0) {
             if (strcmp(command, ECU_COMMAND_BRAKE) == 0) {
                 addLog(BBW_LOG_FILE_NAME, BBW_LOG_MSG);
             } else {
                 addLog(BBW_LOG_FILE_NAME, LOG_MSG_WRONG_COMMAND);
             }
-            sleep(1);
-        } else {
-            addLog(BBW_LOG_FILE_NAME, LOG_MSG_NO_ACTION);
-            sleep(1);
         }
     }
 }
