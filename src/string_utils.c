@@ -78,6 +78,18 @@ void buildHMIOutputSocketName(char *fullSocketName) {
  * RETURN VALUES
  * 
  */
+void buildECUSocketName(char *fullSocketName) {
+    buildFullSocketName(fullSocketName, ECU_SOCKET);
+}
+
+/*
+ * DESCRIPTION
+ *
+ * PARAMETERS
+ * 
+ * RETURN VALUES
+ * 
+ */
 void buildFWCSocketName(char *fullSocketName) {
     buildFullSocketName(fullSocketName, FWC_SOCKET);
 }

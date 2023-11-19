@@ -39,6 +39,7 @@
 /* -------------------------------------------------------------------------- */
 #define ECU_LOG_FILE_NAME "ecu"
 #define ECU_DEBUG_FILE_NAME "ecu_debug"
+#define ECU_SOCKET "ecu"
 #define ECU_COMMAND_LEFT "SINISTRA"
 #define ECU_COMMAND_RIGHT "DESTRA"
 #define ECU_COMMAND_THROTTLE "INCREMENTO 5"
@@ -83,3 +84,10 @@
 #define BBW_SOCKET "brake_by_wire"
 #define BBW_MSG_LEN BUFFER_SIZE
 #define BBW_LOG_MSG "FRENO 5"
+
+/* -------------------------------------------------------------------------- */
+/* Macro - PARK ASSIST                                                        */
+/* -------------------------------------------------------------------------- */
+#define PA_LOG_FILE_NAME "assist"
+#define PA_DEBUG_FILE_NAME "assist_debug"
+#define PA_MSG_LEN BUFFER_SIZE

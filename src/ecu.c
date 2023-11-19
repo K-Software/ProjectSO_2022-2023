@@ -143,35 +143,38 @@ void ecuStart(void)
     free(socketFWC);
 }
 
-/*
- Provare gestire la creazione di tutti i fifo qui 
-*/
-
 void initSockets(void) 
 {
+    // ECO socket
+    printf("-- 1 --");
+    char *socketECU = malloc(strlen(PATH_SOCKET)+strlen(ECU_SOCKET)+strlen(EXT_SOCKET)+1);
+    buildECUSocketName(socketECU);
+    mkfifo(socketECU, 0666);
+    free(socketECU);
+
     // Front windshield camera socket
-    printf("-- 1 --\n");
+    printf("-- 2 --\n");
     char *socketFWC = malloc(strlen(PATH_SOCKET)+strlen(FWC_SOCKET)+strlen(EXT_SOCKET)+1);
     buildFWCSocketName(socketFWC);
     mkfifo(socketFWC, 0666);
     free(socketFWC);
 
     // Steer by wire socket
-    printf("-- 2 --\n");
+    printf("-- 3 --\n");
     char *socketSBW = malloc(strlen(PATH_SOCKET)+strlen(SBW_SOCKET)+strlen(EXT_SOCKET)+1);
     buildSBWSocketName(socketSBW);
     mkfifo(socketSBW, 0666);
     free(socketSBW);
 
     // Throttle control
-    printf("-- 3 --\n");
+    printf("-- 4 --\n");
     char *socketTC = malloc(strlen(PATH_SOCKET)+strlen(TC_SOCKET)+strlen(EXT_SOCKET)+1);
     buildTCSocketName(socketTC);
     mkfifo(socketTC, 0666);
     free(socketTC);
 
     // Brake by wire
-    printf("-- 4 --\n");
+    printf("-- 5 --\n");
     char *socketBBW = malloc(strlen(PATH_SOCKET)+strlen(BBW_SOCKET)+strlen(EXT_SOCKET)+1);
     buildBBWSocketName(socketBBW);
     mkfifo(socketBBW, 0666);
@@ -203,7 +206,6 @@ void parking(char *socketName, int *speed) {
         sleep(1);
     }
     // TODO: call Parking component
-    printf("Wait 30s\n");
-    sleep(30);   
+       
 }
 
