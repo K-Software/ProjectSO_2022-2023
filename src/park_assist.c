@@ -5,6 +5,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <string.h>
 #include "common.h"
 #include "log.h"
 #include "park_assist.h"
@@ -27,7 +28,6 @@ void main(void)
 
 void parkAssistStart(void)
 {
-    // TODO: ...
     int fd = open("/dev/urandom", O_RDONLY);
 
     if (fd == -1) {
@@ -35,6 +35,9 @@ void parkAssistStart(void)
         sprintf(log_msg, "Errore nell'apertura di /dev/urandom");
         addLog(PA_DEBUG_FILE_NAME, log_msg);
     } else {
+
+        char *socketECU = malloc(strlen(PATH_SOCKET)+strlen(ECU_SOCKET)+strlen(EXT_SOCKET)+1);
+        buildECUSocketName(socketECU);
 
         for (int i = 0; i < 30; i++) {
             // Buffer per contenere i 8 byte letti
@@ -45,16 +48,18 @@ void parkAssistStart(void)
 
             // Controlla se la lettura è avvenuta con successo
             if (bytesRead != sizeof(buffer)) {
-                perror("Errore nella lettura da /dev/urandom");
-                close(fd);
-                exit(EXIT_FAILURE);
-            }
-
-            // Log di dati letti
-            for (int i = 0; i < sizeof(buffer); i += 2) {
                 char log_msg[MAX_ROW_LEN_LOG];
-                sprintf(log_msg, "0x%02X%02X", buffer[i], buffer[i + 1]);
-                addLog(PA_LOG_FILE_NAME, log_msg);
+                sprintf(log_msg, "Errore nella lettura da /dev/urandom");
+                addLog(PA_DEBUG_FILE_NAME, log_msg);
+            } else {
+
+                // Log di dati letti
+                for (int i = 0; i < sizeof(buffer); i += 2) {
+                    char log_msg[MAX_ROW_LEN_LOG];
+                    sprintf(log_msg, "0x%02X%02X", buffer[i], buffer[i + 1]);
+                    sendDataToECUComponent(socketECU, log_msg);
+                    addLog(PA_LOG_FILE_NAME, log_msg);
+                }
             }
             sleep(1);
         }
@@ -63,3 +68,8 @@ void parkAssistStart(void)
     }
 }
 
+void sendDataToECUComponent(char *socketName, char *command)
+{
+    int fd = socketOpenWriteMode(PROCESS_NAME, socketName);
+    socketWriteData(PROCESS_NAME, fd, socketName, command);
+}

@@ -57,8 +57,6 @@ void ecuStart(void)
         if (childPid == -1) {
             sprintf(log_msg, ERR_FORK, components[i]);
             addLog(ECU_DEBUG_FILE_NAME, log_msg);
-
-            exit(EXIT_FAILURE);
         } else if (childPid == 0) {
             // Codice eseguito dal processo figlio
 
@@ -68,7 +66,6 @@ void ecuStart(void)
             // Se execlp restituisce, c'è stato un errore
             sprintf(log_msg, ERR_EXECLP, components[i]);
             addLog(ECU_DEBUG_FILE_NAME, log_msg);
-            exit(EXIT_FAILURE);
         }
     }    
 
@@ -146,7 +143,7 @@ void ecuStart(void)
 void initSockets(void) 
 {
     // ECO socket
-    printf("-- 1 --");
+    printf("-- 1 --\n");
     char *socketECU = malloc(strlen(PATH_SOCKET)+strlen(ECU_SOCKET)+strlen(EXT_SOCKET)+1);
     buildECUSocketName(socketECU);
     mkfifo(socketECU, 0666);
@@ -200,12 +197,34 @@ void sendDataToBBWComponent(char *socketName)
 }
 
 void parking(char *socketName, int *speed) {
+    char log_msg[MAX_ROW_LEN_LOG];
+
+    // Azzero la velocita`
     for (; *speed > 0; *speed -= 5) {
         sendDataToBBWComponent(socketName);
         printf("%s - speed: %d\n", ECU_COMMAND_BRAKE, *speed);
         sleep(1);
     }
-    // TODO: call Parking component
-       
+
+    pid_t parkAssistPid = fork();
+
+    if (parkAssistPid == -1) {
+        sprintf(log_msg, ERR_FORK, "park_assist.out");
+        addLog(ECU_DEBUG_FILE_NAME, log_msg);
+    }  else if (parkAssistPid == 0) {
+        // Codice eseguito dal processo figlio
+
+        // Esegui un programma esterno
+        execlp("/repo_elaborato/bin/park_assist.out", "park_assist.out", (char *)NULL);
+
+        // Se execlp restituisce, c'è stato un errore
+        sprintf(log_msg, ERR_EXECLP, "park_assist.out");
+        addLog(ECU_DEBUG_FILE_NAME, log_msg);
+    }
+    for (int i = 0; i < 30; i++) {
+        // TODO: read data from park assist component
+        sleep(1);
+    }
+    kill(parkAssistPid, SIGTERM);
 }
 
