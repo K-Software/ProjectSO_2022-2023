@@ -31,6 +31,8 @@
 /* Functions                                                                  */
 /* -------------------------------------------------------------------------- */
 
+pid_t pids[4];
+
 int main(void)
 {
     ecuStart();
@@ -67,6 +69,7 @@ void ecuStart(void)
             sprintf(log_msg, ERR_EXECLP, components[i]);
             addLog(ECU_DEBUG_FILE_NAME, log_msg);
         }
+        pids[i] = childPid;
     }    
 
     /* ECU */
@@ -226,5 +229,9 @@ void parking(char *socketName, int *speed) {
         sleep(1);
     }
     kill(parkAssistPid, SIGTERM);
+    for (int i = 0; i < 4; i++) {
+        kill(pids[i], SIGTERM);
+    }
+    exit(EXIT_SUCCESS);
 }
 
