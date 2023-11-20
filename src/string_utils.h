@@ -9,3 +9,4 @@ void buildSBWSocketName(char *fullSocketName);
 void buildTCSocketName(char *fullSocketName);
 void buildBBWSocketName(char *fullSocketName);
 int getSubStr(char *source, char *target,int from, int to);
+int isStringInArray(const char *target, const char *array[], int size);

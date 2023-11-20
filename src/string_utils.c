@@ -46,6 +46,7 @@ void main(void) {
 
 /*
  * DESCRIPTION
+ * This function build the full name of socket
  *
  * PARAMETERS
  * 
@@ -181,4 +182,22 @@ int getSubStr(char *source, char *target,int from, int to)
   target[j]='\0';
 
   return 0;
+}
+
+/*
+ * DESCRIPTION
+ *
+ * PARAMETERS
+ *
+ * RETURN VALUES
+ *
+ */
+int isStringInArray(const char *target, const char *array[], int size)
+{
+  for (int i = 0; i < size; ++i) {
+        if (strcmp(target, array[i]) == 0) {
+            return 1; // La stringa è stata trovata nell'array
+        }
+    }
+    return 0; // La stringa non è stata trovata nell'array
 }
