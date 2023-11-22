@@ -44,6 +44,7 @@
 #define ECU_COMMAND_RIGHT "DESTRA"
 #define ECU_COMMAND_THROTTLE "INCREMENTO 5"
 #define ECU_COMMAND_BRAKE "FRENO 5"
+#define ECU_PARKING "PARCHEGGIO"
 
 /* -------------------------------------------------------------------------- */
 /* Macro - FRONT WISHSHIELD CAMERA                                            */
