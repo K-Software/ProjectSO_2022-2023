@@ -32,6 +32,14 @@ void main(void)
     brakeByWireStart();
 } 
 
+/*
+ * DESCRIPTION
+ *
+ * PARAMETERS
+ * 
+ * RETURN VALUES
+ * 
+ */
 void brakeByWireStart(void) 
 {
     char *socketName = malloc(strlen(PATH_SOCKET)+strlen(BBW_SOCKET)+strlen(EXT_SOCKET)+1);

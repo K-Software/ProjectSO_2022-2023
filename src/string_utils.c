@@ -195,9 +195,9 @@ int getSubStr(char *source, char *target,int from, int to)
 int isStringInArray(const char *target, const char *array[], int size)
 {
   for (int i = 0; i < size; ++i) {
-        if (strcmp(target, array[i]) == 0) {
-            return 1; // La stringa è stata trovata nell'array
-        }
+    if (strcmp(target, array[i]) == 0) {
+      return 1; // La stringa è stata trovata nell'array
     }
-    return 0; // La stringa non è stata trovata nell'array
+  }
+  return 0; // La stringa non è stata trovata nell'array
 }

@@ -32,6 +32,14 @@ void main(void)
     throttleControlStart();
 } 
 
+/*
+ * DESCRIPTION
+ *
+ * PARAMETERS
+ * 
+ * RETURN VALUES
+ * 
+ */
 void throttleControlStart(void) 
 {
     char *socketName = malloc(strlen(PATH_SOCKET)+strlen(TC_SOCKET)+strlen(EXT_SOCKET)+1);

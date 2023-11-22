@@ -54,7 +54,12 @@ void main(void) {
 #endif
 
 /*
+ * DESCRIPTION
  *
+ * PARAMETERS
+ * 
+ * RETURN VALUES
+ * 
  */
 int socketOpenWriteMode(char *processName, char *socketName) 
 {
@@ -74,7 +79,12 @@ int socketOpenWriteMode(char *processName, char *socketName)
 }
 
 /*
+ * DESCRIPTION
  *
+ * PARAMETERS
+ * 
+ * RETURN VALUES
+ * 
  */
 int socketOpenReadMode(char *processName, char *socketName)
 {
@@ -94,7 +104,12 @@ int socketOpenReadMode(char *processName, char *socketName)
 }
 
 /*
+ * DESCRIPTION
  *
+ * PARAMETERS
+ * 
+ * RETURN VALUES
+ * 
  */
 int socketWriteData(char *processName, int fd, char *socketName, char *data) 
 {
@@ -113,7 +128,12 @@ int socketWriteData(char *processName, int fd, char *socketName, char *data)
 }
 
 /*
+ * DESCRIPTION
  *
+ * PARAMETERS
+ * 
+ * RETURN VALUES
+ * 
  */
 int socketReadData(char *processName, int fd, char *socketName, char *data)
 {
@@ -138,7 +158,12 @@ int socketReadData(char *processName, int fd, char *socketName, char *data)
 }
 
 /*
+ * DESCRIPTION
  *
+ * PARAMETERS
+ * 
+ * RETURN VALUES
+ * 
  */
 int socketClose(char *processName, int fd, char *socketName)
 {

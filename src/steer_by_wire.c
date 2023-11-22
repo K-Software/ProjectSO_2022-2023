@@ -32,6 +32,14 @@ void main(void)
     steerByWireStart();
 } 
 
+/*
+ * DESCRIPTION
+ *
+ * PARAMETERS
+ * 
+ * RETURN VALUES
+ * 
+ */
 void steerByWireStart(void) 
 {
     char *socketName = malloc(strlen(PATH_SOCKET)+strlen(SBW_SOCKET)+strlen(EXT_SOCKET)+1);
