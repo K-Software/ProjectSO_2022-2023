@@ -26,6 +26,14 @@ void main(void)
     parkAssistStart();
 }
 
+/*
+ * DESCRIPTION
+ *
+ * PARAMETERS
+ * 
+ * RETURN VALUES
+ * 
+ */
 void parkAssistStart(void)
 {
     int fd = open("/dev/urandom", O_RDONLY);
@@ -39,7 +47,7 @@ void parkAssistStart(void)
         char *socketECU = malloc(strlen(PATH_SOCKET)+strlen(ECU_SOCKET)+strlen(EXT_SOCKET)+1);
         buildECUSocketName(socketECU);
 
-        for (int i = 0; i < 30; i++) {
+        for (int i = 0; i < 120; i++) {
             // Buffer per contenere i 8 byte letti
             unsigned char buffer[8];
 
@@ -54,14 +62,15 @@ void parkAssistStart(void)
             } else {
 
                 // Log di dati letti
-                for (int i = 0; i < sizeof(buffer); i += 2) {
+                for (int j = 0; j < sizeof(buffer); j += 2) {
                     char log_msg[MAX_ROW_LEN_LOG];
-                    sprintf(log_msg, "0x%02X%02X", buffer[i], buffer[i + 1]);
+                    sprintf(log_msg, "0x%02X%02X", buffer[j], buffer[j + 1]);
                     sendDataToECUComponent(socketECU, log_msg);
                     addLog(PA_LOG_FILE_NAME, log_msg);
+                    usleep(250000);
                 }
             }
-            sleep(1);
+            //sleep(1);
         }
         // Chiudi il file descriptor
         close(fd);
