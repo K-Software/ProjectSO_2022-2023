@@ -95,6 +95,9 @@ void ecuStart(void)
     char *socketBBW = malloc(strlen(PATH_SOCKET)+strlen(BBW_SOCKET)+strlen(EXT_SOCKET)+1);
     buildBBWSocketName(socketBBW);
 
+    char *socketHMIOutput = malloc(strlen(PATH_SOCKET)+strlen(HMI_OUTPUT_SOCKET)+strlen(EXT_SOCKET)+1);
+    buildHMIOutputSocketName(socketHMIOutput);
+
     int fd = socketOpenReadMode(PROCESS_NAME, socketFWC);
     while (1) {
         char command[FWC_MSG_LEN] = "";
@@ -114,31 +117,40 @@ void ecuStart(void)
         printf("Data: %s - ", command);
         if (strcmp(FWC_COMMAND_LEFT, command) == 0) {
             addLog(ECU_LOG_FILE_NAME, ECU_COMMAND_LEFT);
-            sendDataToSBWComponent(socketSBW, ECU_COMMAND_LEFT);
+            sendDataToComponent(socketSBW, ECU_COMMAND_LEFT);
+            sendDataToComponent(socketHMIOutput, ECU_COMMAND_LEFT);
             printf("\n");
         } else if (strcmp(FWC_COMMAND_RIGHT, command) == 0) {
             addLog(ECU_LOG_FILE_NAME, ECU_COMMAND_RIGHT);
-            sendDataToSBWComponent(socketSBW, ECU_COMMAND_RIGHT);
+            sendDataToComponent(socketSBW, ECU_COMMAND_RIGHT);
+            sendDataToComponent(socketHMIOutput, ECU_COMMAND_RIGHT);
             printf("\n");
         } else if (strcmp(FWC_COMMAND_PARKING, command) == 0) {
             printf("Parking\n");
             addLog(ECU_LOG_FILE_NAME, ECU_PARKING);
+            sendDataToComponent(socketHMIOutput, ECU_PARKING);
             parking(&speed, pids);
         } else if (strcmp(FWC_COMMAND_DANGER, command) == 0) {
-            printf("!!! DANGER !!!\n");
+            printf("Pericolo\n");
+            kill(pids[3], SIGALRM);
+            addLog(ECU_LOG_FILE_NAME, ECU_STOP);
+            sendDataToComponent(socketHMIOutput, ECU_STOP);
+            speed = 0;
         } else {
             printf("Speed: %d \n", speed);
             int temp = atoi(command);
             if (temp > speed) {
                 for (; speed < temp; speed += 5) {
                     addLog(ECU_LOG_FILE_NAME, ECU_COMMAND_THROTTLE);
-                    sendDataToTCComponent(socketTC);
+                    sendDataToComponent(socketHMIOutput, ECU_COMMAND_THROTTLE);
+                    sendDataToComponent(socketTC, ECU_COMMAND_THROTTLE);
                     printf("%s\n", ECU_COMMAND_THROTTLE);
                 }
             } else if (speed > temp) {
                 for (; speed > temp; speed -= 5) {
                     addLog(ECU_LOG_FILE_NAME, ECU_COMMAND_BRAKE);
-                    sendDataToBBWComponent(socketBBW);
+                    sendDataToComponent(socketBBW, ECU_COMMAND_BRAKE);
+                    sendDataToComponent(socketHMIOutput, ECU_COMMAND_BRAKE);
                     printf("%s\n", ECU_COMMAND_BRAKE);
                 }
             }
@@ -188,19 +200,19 @@ void initSockets(void)
     mkfifo(socketSBW, 0666);
     free(socketSBW);
 
-    // Throttle control
+    // Throttle control socket
     printf("-- 4 --\n");
     char *socketTC = malloc(strlen(PATH_SOCKET)+strlen(TC_SOCKET)+strlen(EXT_SOCKET)+1);
     buildTCSocketName(socketTC);
     mkfifo(socketTC, 0666);
     free(socketTC);
 
-    // Brake by wire
+    // Brake by wire socket
     printf("-- 5 --\n");
     char *socketBBW = malloc(strlen(PATH_SOCKET)+strlen(BBW_SOCKET)+strlen(EXT_SOCKET)+1);
     buildBBWSocketName(socketBBW);
     mkfifo(socketBBW, 0666);
-    free(socketBBW); 
+    free(socketBBW);
 }
 
 /*
@@ -211,38 +223,10 @@ void initSockets(void)
  * RETURN VALUES
  * 
  */
-void sendDataToSBWComponent(char *socketName, char *command) 
+void sendDataToComponent(char *socketName, char *command)
 {
     int fd = socketOpenWriteMode(PROCESS_NAME, socketName);
     socketWriteData(PROCESS_NAME, fd, socketName, command);
-}
-
-/*
- * DESCRIPTION
- *
- * PARAMETERS
- * 
- * RETURN VALUES
- * 
- */
-void sendDataToTCComponent(char *socketName) 
-{
-    int fd = socketOpenWriteMode(PROCESS_NAME, socketName);
-    socketWriteData(PROCESS_NAME, fd, socketName, ECU_COMMAND_THROTTLE);
-}
-
-/*
- * DESCRIPTION
- *
- * PARAMETERS
- * 
- * RETURN VALUES
- * 
- */
-void sendDataToBBWComponent(char *socketName)
-{
-    int fd = socketOpenWriteMode(PROCESS_NAME, socketName);
-    socketWriteData(PROCESS_NAME, fd, socketName, ECU_COMMAND_BRAKE);
 }
 
 /*
@@ -265,7 +249,7 @@ void parking(int *speed, pid_t pids[4]) {
 
     // Azzero la velocita`
     for (; *speed > 0; *speed -= 5) {
-        sendDataToBBWComponent(socketBBW);
+        sendDataToComponent(socketBBW, ECU_COMMAND_BRAKE);
         printf("%s - speed: %d\n", ECU_COMMAND_BRAKE, *speed);
         sleep(1);
     }
