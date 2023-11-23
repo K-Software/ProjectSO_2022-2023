@@ -50,12 +50,13 @@ void throttleControlStart(void)
         char log_msg[MAX_ROW_LEN_LOG];
         char command[TC_MSG_LEN] = "";
         socketReadData(PROCESS_NAME, fd, socketName, command);
-        if (strlen(command) != 0) {
+        if (strlen(command) > 0) {
             if (strcmp(command, ECU_COMMAND_THROTTLE) == 0) {
                 addLog(TC_LOG_FILE_NAME, TC_LOG_MSG);
             } else {
-                addLog(TC_LOG_FILE_NAME, LOG_MSG_WRONG_COMMAND);
+                sprintf(log_msg, LOG_MSG_WRONG_COMMAND, command);
+                addLog(TC_LOG_FILE_NAME, log_msg);
             }
-        } 
+        }
     }    
 }
