@@ -14,44 +14,50 @@
 #include <unistd.h>
 #include "common.h"
 #include "hmi_output.h"
+#include "socket_utils.h"
 #include "string_utils.h"
 
 /* -------------------------------------------------------------------------- */
 /* Macro                                                                      */
 /* -------------------------------------------------------------------------- */
+#define PROCESS_NAME "HMI OUTPUT"
 
 /* -------------------------------------------------------------------------- */
 /* Functions                                                                  */
 /* -------------------------------------------------------------------------- */
 
-int main(void) {
-    int fd, esito;
-    char comunicazione[HMI_INPUT_MSG_LEN];
+void main(void) 
+{
+    hmiOutputStart();
+}
 
+
+int hmiOutputStart(void) 
+{
     char *socketName = malloc(strlen(PATH_SOCKET)+strlen(HMI_OUTPUT_SOCKET)+strlen(EXT_SOCKET)+1);
     buildHMIOutputSocketName(socketName);
-    printf("1 - FIFO name: %s\n", socketName);
 
-    do {
-        printf("2 - Apro il FIFO\n");
-        fd = open(socketName,O_RDONLY | O_NONBLOCK);
-        if (fd == -1) {
-            printf("3 - Errore nell'apertura del FIFO %s\n", socketName);
-            sleep(15);
-        } else {
-            printf("3 - Aperto il FIFO %s\n", socketName);
-        }
-    } while (fd == -1);
-    
+    initSockets();
+
+    printf("HMI OUTPUT:\n");    
+    int fd = socketOpenReadMode(PROCESS_NAME, socketName);
     while(1) {
-        printf("4 - ");
-        strcpy(comunicazione,"         ");
-        if ((esito = read(fd, comunicazione, sizeof(comunicazione))) != 0) {
-            printf("Comunicazione: %s\n", comunicazione);
-            sleep(1);
-        } else {
-            printf("Nessuna comunicazione\n");
-            sleep(1);
+        char log_msg[MAX_ROW_LEN_LOG];
+        char command[HMI_OUTPUT_MSG_LEM] = "";
+        socketReadData(PROCESS_NAME, fd, socketName, command);
+        if (strlen(command) > 0) {
+            printf(" -> %s\n", command);
         }
+        //sleep(1);
     }
+}
+
+void initSockets(void)
+{
+    // HMI Output socket
+    printf("-- 1 --\n");
+    char *socketHMIOutput = malloc(strlen(PATH_SOCKET)+strlen(HMI_OUTPUT_SOCKET)+strlen(EXT_SOCKET)+1);
+    buildHMIOutputSocketName(socketHMIOutput);
+    mkfifo(socketHMIOutput, 0666);
+    free(socketHMIOutput);
 }
