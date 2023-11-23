@@ -45,6 +45,7 @@
 #define ECU_COMMAND_THROTTLE "INCREMENTO 5"
 #define ECU_COMMAND_BRAKE "FRENO 5"
 #define ECU_PARKING "PARCHEGGIO"
+#define ECU_STOP "ARRESTO"
 
 /* -------------------------------------------------------------------------- */
 /* Macro - FRONT WISHSHIELD CAMERA                                            */
@@ -84,7 +85,8 @@
 #define BBW_DEBUG_FILE_NAME "brake_debug"
 #define BBW_SOCKET "brake_by_wire"
 #define BBW_MSG_LEN BUFFER_SIZE
-#define BBW_LOG_MSG "FRENO 5"
+#define BBW_BRAKE_MSG "FRENO 5"
+#define BBW_STOP_MSG "ARRESTO AUTO"
 
 /* -------------------------------------------------------------------------- */
 /* Macro - PARK ASSIST                                                        */
