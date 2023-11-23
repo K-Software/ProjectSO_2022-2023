@@ -52,14 +52,14 @@ void brakeByWireStart(void)
         char log_msg[MAX_ROW_LEN_LOG];
         char command[BBW_MSG_LEN] = "";
         socketReadData(PROCESS_NAME, fd, socketName, command);
-        if (strlen(command) != 0) {
+        if (strlen(command) > 0) {
             if (strcmp(command, ECU_COMMAND_BRAKE) == 0) {
                 addLog(BBW_LOG_FILE_NAME, BBW_BRAKE_MSG);
             } else {
-                addLog(BBW_LOG_FILE_NAME, LOG_MSG_WRONG_COMMAND);
+                sprintf(log_msg, LOG_MSG_WRONG_COMMAND, command);
+                addLog(BBW_LOG_FILE_NAME, log_msg);
             }
         }
-        sleep(1);
     }
 }
 
