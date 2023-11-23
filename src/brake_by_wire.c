@@ -29,6 +29,8 @@
 
 void main(void)
 {
+    signal(SIGALRM, handlerArresto);
+
     brakeByWireStart();
 } 
 
@@ -52,10 +54,15 @@ void brakeByWireStart(void)
         socketReadData(PROCESS_NAME, fd, socketName, command);
         if (strlen(command) != 0) {
             if (strcmp(command, ECU_COMMAND_BRAKE) == 0) {
-                addLog(BBW_LOG_FILE_NAME, BBW_LOG_MSG);
+                addLog(BBW_LOG_FILE_NAME, BBW_BRAKE_MSG);
             } else {
                 addLog(BBW_LOG_FILE_NAME, LOG_MSG_WRONG_COMMAND);
             }
         }
+        sleep(1);
     }
+}
+
+void handlerArresto(int signum) {
+    addLog(BBW_LOG_FILE_NAME, BBW_STOP_MSG);
 }

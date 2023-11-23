@@ -2,3 +2,4 @@
 /* brake_by_wire.c                                                            */
 /* -------------------------------------------------------------------------- */
 void brakeByWireStart(void);
+void handlerArresto(int signum);
