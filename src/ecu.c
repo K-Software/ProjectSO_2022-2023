@@ -29,13 +29,20 @@
 #define DATA_PARKING "Dato dal PARK ASSIST: %s"
 #define ERR_PARKING "Errore nell'esecuzione PARCHEGGIO"
 
-
 /* -------------------------------------------------------------------------- */
 /* Functions                                                                  */
 /* -------------------------------------------------------------------------- */
 
+int speed = 0;
+int start = 0;
+pid_t pids[5];
+
 int main(void)
 {
+    signal(SIGUSR1, handlerStart);
+
+    signal(SIGALRM, handlerStop);
+
     ecuStart();
 }
 
@@ -50,19 +57,19 @@ int main(void)
 void ecuStart(void)
 {
     char prevCommand[FWC_MSG_LEN] = "";
-    int speed = 0;
-    pid_t pids[4];
+    //pid_t pids[5];
 
     initSockets();
 
     const char *paths[] = {"/repo_elaborato/bin/front_windshield_camera.out", 
         "/repo_elaborato/bin/steer_by_wire.out",
         "/repo_elaborato/bin/throttle_control.out",
-        "/repo_elaborato/bin/brake_by_wire.out"};
+        "/repo_elaborato/bin/brake_by_wire.out",
+        "//repo_elaborato/bin/hmi_input.out"};
     const char *components[] = {"front_windshield_camera.out", "steer_by_wire.out",
-        "throttle_control.out", "brake_by_wire.out"};
+        "throttle_control.out", "brake_by_wire.out", "hmi_input.out"};
 
-    for (int i = 0; i < 4; ++i) {
+    for (int i = 0; i < 5; ++i) {
         char log_msg[MAX_ROW_LEN_LOG];
         pid_t childPid = fork();
 
@@ -98,6 +105,11 @@ void ecuStart(void)
     char *socketHMIOutput = malloc(strlen(PATH_SOCKET)+strlen(HMI_OUTPUT_SOCKET)+strlen(EXT_SOCKET)+1);
     buildHMIOutputSocketName(socketHMIOutput);
 
+    while (start == 0) {
+        addLog(ECU_DEBUG_FILE_NAME, "OFF");
+        sleep(1);
+    }
+
     int fd = socketOpenReadMode(PROCESS_NAME, socketFWC);
     while (1) {
         char command[FWC_MSG_LEN] = "";
@@ -114,47 +126,38 @@ void ecuStart(void)
             getSubStr(prevCommand, command, 0, indice - 1);
         }
 
-        printf("Data: %s - ", command);
         if (strcmp(FWC_COMMAND_LEFT, command) == 0) {
             addLog(ECU_LOG_FILE_NAME, ECU_COMMAND_LEFT);
             sendDataToComponent(socketSBW, ECU_COMMAND_LEFT);
             sendDataToComponent(socketHMIOutput, ECU_COMMAND_LEFT);
-            printf("\n");
         } else if (strcmp(FWC_COMMAND_RIGHT, command) == 0) {
             addLog(ECU_LOG_FILE_NAME, ECU_COMMAND_RIGHT);
             sendDataToComponent(socketSBW, ECU_COMMAND_RIGHT);
             sendDataToComponent(socketHMIOutput, ECU_COMMAND_RIGHT);
-            printf("\n");
         } else if (strcmp(FWC_COMMAND_PARKING, command) == 0) {
-            printf("Parking\n");
             addLog(ECU_LOG_FILE_NAME, ECU_PARKING);
             sendDataToComponent(socketHMIOutput, ECU_PARKING);
             parking(&speed, pids);
         } else if (strcmp(FWC_COMMAND_DANGER, command) == 0) {
-            printf("Pericolo\n");
             kill(pids[3], SIGALRM);
             addLog(ECU_LOG_FILE_NAME, ECU_STOP);
             sendDataToComponent(socketHMIOutput, ECU_STOP);
             speed = 0;
         } else {
-            printf("Speed: %d \n", speed);
             int temp = atoi(command);
             if (temp > speed) {
                 for (; speed < temp; speed += 5) {
                     addLog(ECU_LOG_FILE_NAME, ECU_COMMAND_THROTTLE);
                     sendDataToComponent(socketHMIOutput, ECU_COMMAND_THROTTLE);
                     sendDataToComponent(socketTC, ECU_COMMAND_THROTTLE);
-                    printf("%s\n", ECU_COMMAND_THROTTLE);
                 }
             } else if (speed > temp) {
                 for (; speed > temp; speed -= 5) {
                     addLog(ECU_LOG_FILE_NAME, ECU_COMMAND_BRAKE);
                     sendDataToComponent(socketBBW, ECU_COMMAND_BRAKE);
                     sendDataToComponent(socketHMIOutput, ECU_COMMAND_BRAKE);
-                    printf("%s\n", ECU_COMMAND_BRAKE);
                 }
             }
-            
         }
         if (strlen(command) > 0) {
             strcpy(prevCommand, command);
@@ -180,35 +183,30 @@ void ecuStart(void)
 void initSockets(void) 
 {
     // ECO socket
-    printf("-- 1 --\n");
     char *socketECU = malloc(strlen(PATH_SOCKET)+strlen(ECU_SOCKET)+strlen(EXT_SOCKET)+1);
     buildECUSocketName(socketECU);
     mkfifo(socketECU, 0666);
     free(socketECU);
 
     // Front windshield camera socket
-    printf("-- 2 --\n");
     char *socketFWC = malloc(strlen(PATH_SOCKET)+strlen(FWC_SOCKET)+strlen(EXT_SOCKET)+1);
     buildFWCSocketName(socketFWC);
     mkfifo(socketFWC, 0666);
     free(socketFWC);
 
     // Steer by wire socket
-    printf("-- 3 --\n");
     char *socketSBW = malloc(strlen(PATH_SOCKET)+strlen(SBW_SOCKET)+strlen(EXT_SOCKET)+1);
     buildSBWSocketName(socketSBW);
     mkfifo(socketSBW, 0666);
     free(socketSBW);
 
     // Throttle control socket
-    printf("-- 4 --\n");
     char *socketTC = malloc(strlen(PATH_SOCKET)+strlen(TC_SOCKET)+strlen(EXT_SOCKET)+1);
     buildTCSocketName(socketTC);
     mkfifo(socketTC, 0666);
     free(socketTC);
 
     // Brake by wire socket
-    printf("-- 5 --\n");
     char *socketBBW = malloc(strlen(PATH_SOCKET)+strlen(BBW_SOCKET)+strlen(EXT_SOCKET)+1);
     buildBBWSocketName(socketBBW);
     mkfifo(socketBBW, 0666);
@@ -292,5 +290,54 @@ void parking(int *speed, pid_t pids[4]) {
         kill(pids[i], SIGTERM);
     }
     exit(EXIT_SUCCESS);
+}
+
+/*
+ * DESCRIPTION
+ *
+ * PARAMETERS
+ * 
+ * RETURN VALUES
+ * 
+ */
+void handlerStart(int signum) 
+{
+    addLog(ECU_DEBUG_FILE_NAME, "HMI INPUT: INIZIO");
+    start = 1;
+}
+
+/*
+ * DESCRIPTION
+ *
+ * PARAMETERS
+ * 
+ * RETURN VALUES
+ * 
+ */
+void handlerParking(int signum) 
+{
+    // TODO: ...
+}
+
+/*
+ * DESCRIPTION
+ *
+ * PARAMETERS
+ * 
+ * RETURN VALUES
+ * 
+ */
+void handlerStop(int signum) 
+{
+    char *socketHMIOutput = malloc(strlen(PATH_SOCKET)+strlen(HMI_OUTPUT_SOCKET)+strlen(EXT_SOCKET)+1);
+    buildHMIOutputSocketName(socketHMIOutput);
+
+    addLog(ECU_DEBUG_FILE_NAME, "HMI INPUT: ARRESTO");
+    kill(pids[3], SIGALRM);
+    addLog(ECU_LOG_FILE_NAME, ECU_STOP);
+    sendDataToComponent(socketHMIOutput, ECU_STOP);
+    speed = 0;
+
+    free(socketHMIOutput);
 }
 
