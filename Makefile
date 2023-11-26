@@ -41,6 +41,12 @@ hmi_output.out: src/hmi_output.c socket_utils.o string_utils.o log.o
 	cc $^ -o ./bin/$@
 
 # ---------------------------------------------------------------------------- #
+# hmi_input
+# ---------------------------------------------------------------------------- #
+hmi_input.out: src/hmi_input.c socket_utils.o string_utils.o log.o
+	cc $^ -o ./bin/$@
+
+# ---------------------------------------------------------------------------- #
 # socket_utils.o
 # ---------------------------------------------------------------------------- #
 socket_utils.o: src/socket_utils.c log.o
@@ -59,4 +65,4 @@ log.o: src/log.c
 	cc -c $^ 
 
 all: ecu.out front_windshield_camera.out steer_by_wire.out throttle_control.out\
-brake_by_wire.out park_assist.out hmi_output.out
+brake_by_wire.out park_assist.out hmi_output.out hmi_input.out
