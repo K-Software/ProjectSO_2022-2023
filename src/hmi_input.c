@@ -44,7 +44,8 @@ int hmiInputStrat(void) {
     
     printf("HMI INPUT\n");
     do {
-        printf("Inserisci il comando: ");
+        printf("Inserisci il comando(%s, %s, %s): ", HMI_INPUT_COMMAND_START, 
+            HMI_INPUT_COMMAND_PARKING, HMI_INPUT_COMMAND_STOP);
         scanf("%s", command);
         if (strcmp(command, HMI_INPUT_COMMAND_START) == 0) {
             kill(ppid, SIGUSR1);

@@ -41,6 +41,8 @@ int main(void)
 {
     signal(SIGUSR1, handlerStart);
 
+    signal(SIGUSR2, handlerParking);
+
     signal(SIGALRM, handlerStop);
 
     ecuStart();
@@ -248,7 +250,6 @@ void parking(int *speed, pid_t pids[4]) {
     // Azzero la velocita`
     for (; *speed > 0; *speed -= 5) {
         sendDataToComponent(socketBBW, ECU_COMMAND_BRAKE);
-        printf("%s - speed: %d\n", ECU_COMMAND_BRAKE, *speed);
         sleep(1);
     }
 
@@ -302,7 +303,9 @@ void parking(int *speed, pid_t pids[4]) {
  */
 void handlerStart(int signum) 
 {
-    addLog(ECU_DEBUG_FILE_NAME, "HMI INPUT: INIZIO");
+    char log_msg[MAX_ROW_LEN_LOG];
+    sprintf(log_msg, "HMI INPUT: %s", HMI_INPUT_COMMAND_START);
+    addLog(ECU_DEBUG_FILE_NAME, log_msg);
     start = 1;
 }
 
@@ -316,7 +319,17 @@ void handlerStart(int signum)
  */
 void handlerParking(int signum) 
 {
-    // TODO: ...
+    char log_msg[MAX_ROW_LEN_LOG];
+    char *socketHMIOutput = malloc(strlen(PATH_SOCKET)+strlen(HMI_OUTPUT_SOCKET)+strlen(EXT_SOCKET)+1);
+    buildHMIOutputSocketName(socketHMIOutput);
+
+    sprintf(log_msg, "HMI INPUT: %s", HMI_INPUT_COMMAND_PARKING);
+    addLog(ECU_DEBUG_FILE_NAME, log_msg);
+    addLog(ECU_LOG_FILE_NAME, ECU_PARKING);
+    sendDataToComponent(socketHMIOutput, ECU_PARKING);
+    parking(&speed, pids);
+
+    free(socketHMIOutput);
 }
 
 /*
@@ -329,10 +342,12 @@ void handlerParking(int signum)
  */
 void handlerStop(int signum) 
 {
+    char log_msg[MAX_ROW_LEN_LOG];
     char *socketHMIOutput = malloc(strlen(PATH_SOCKET)+strlen(HMI_OUTPUT_SOCKET)+strlen(EXT_SOCKET)+1);
     buildHMIOutputSocketName(socketHMIOutput);
 
-    addLog(ECU_DEBUG_FILE_NAME, "HMI INPUT: ARRESTO");
+    sprintf(log_msg, "HMI INPUT: %s", HMI_INPUT_COMMAND_STOP);
+    addLog(ECU_DEBUG_FILE_NAME, log_msg);
     kill(pids[3], SIGALRM);
     addLog(ECU_LOG_FILE_NAME, ECU_STOP);
     sendDataToComponent(socketHMIOutput, ECU_STOP);
