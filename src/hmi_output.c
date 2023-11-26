@@ -39,7 +39,7 @@ int hmiOutputStart(void)
 
     initSockets();
 
-    printf("HMI OUTPUT:\n");    
+    printf("HMI OUTPUT\n");    
     int fd = socketOpenReadMode(PROCESS_NAME, socketName);
     while(1) {
         char log_msg[MAX_ROW_LEN_LOG];
@@ -55,7 +55,6 @@ int hmiOutputStart(void)
 void initSockets(void)
 {
     // HMI Output socket
-    printf("-- 1 --\n");
     char *socketHMIOutput = malloc(strlen(PATH_SOCKET)+strlen(HMI_OUTPUT_SOCKET)+strlen(EXT_SOCKET)+1);
     buildHMIOutputSocketName(socketHMIOutput);
     mkfifo(socketHMIOutput, 0666);
