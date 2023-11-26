@@ -55,6 +55,8 @@ void brakeByWireStart(void)
         if (strlen(command) > 0) {
             if (strcmp(command, ECU_COMMAND_BRAKE) == 0) {
                 addLog(BBW_LOG_FILE_NAME, BBW_BRAKE_MSG);
+            } else if (strcmp(command, ECU_STOP) == 0) {
+                addLog(BBW_LOG_FILE_NAME, BBW_STOP_MSG);
             } else {
                 sprintf(log_msg, LOG_MSG_WRONG_COMMAND, command);
                 addLog(BBW_LOG_FILE_NAME, log_msg);
