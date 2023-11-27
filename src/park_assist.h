@@ -1,5 +1,5 @@
 /* -------------------------------------------------------------------------- */
 /* park_assist.h                                                              */
 /* -------------------------------------------------------------------------- */
-void parkAssistStart(void);
+void parkAssistStart(char *mode);
 void sendDataToECUComponent(char *socketName, char *command);

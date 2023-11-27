@@ -16,14 +16,18 @@
 /* Marco                                                                      */
 /* -------------------------------------------------------------------------- */
 #define PROCESS_NAME "PARK ASSIST"
+#define NORMALE_FILE_NAME "/dev/urandom"
+#define ARTIFICIALE_FILE_NAME "./data/randomARTIFICIALE.binary"
+#define ERR_MSG "Errore nell'apertura di %s"
 
 /* -------------------------------------------------------------------------- */
 /* Functions                                                                  */
 /* -------------------------------------------------------------------------- */
 
-void main(void)
+void main(int argc, char *argv[])
 {
-    parkAssistStart();
+    addLog(PA_DEBUG_FILE_NAME, argv[1]);
+    parkAssistStart(argv[1]);
 }
 
 /*
@@ -34,13 +38,21 @@ void main(void)
  * RETURN VALUES
  * 
  */
-void parkAssistStart(void)
+void parkAssistStart(char *mode)
 {
+
+
     int fd = open("/dev/urandom", O_RDONLY);
+    if (strcmp("ARTIFICIALE", mode) == 0) {
+        fd = open(ARTIFICIALE_FILE_NAME, O_RDONLY);
+    }
 
     if (fd == -1) {
-        char log_msg[MAX_ROW_LEN_LOG];
-        sprintf(log_msg, "Errore nell'apertura di /dev/urandom");
+        char log_msg[MAX_ROW_LEN_LOG] = "";
+        sprintf(log_msg, ERR_MSG, NORMALE_FILE_NAME);
+        if (strcmp("ARTIFICIALE", mode) == 0) {
+            sprintf(log_msg, ERR_MSG, ARTIFICIALE_FILE_NAME);
+        }
         addLog(PA_DEBUG_FILE_NAME, log_msg);
     } else {
 

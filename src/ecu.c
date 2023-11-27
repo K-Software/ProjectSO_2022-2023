@@ -36,9 +36,12 @@
 int speed = 0;
 int start = 0;
 pid_t pids[5];
+char mode[20] = "";
 
-int main(void)
+int main(int argc, char *argv[])
 {
+    strcpy(mode, argv[1]);
+
     signal(SIGUSR1, handlerStart);
 
     signal(SIGUSR2, handlerParking);
@@ -50,16 +53,19 @@ int main(void)
 
 /*
  * DESCRIPTION
+ * This
  *
  * PARAMETERS
  * 
  * RETURN VALUES
  * 
  */
-void ecuStart(void)
+void ecuStart()
 {
     char prevCommand[FWC_MSG_LEN] = "";
-    //pid_t pids[5];
+    char log_msg[MAX_ROW_LEN_LOG];
+    sprintf(log_msg, "Mode: %s", mode);
+    addLog(ECU_DEBUG_FILE_NAME, log_msg);
 
     initSockets();
 
@@ -265,7 +271,7 @@ void parking(int *speed, pid_t pids[4]) {
             // Codice eseguito dal processo figlio
 
             // Esegui un programma esterno
-            execlp("/repo_elaborato/bin/park_assist.out", "park_assist.out", (char *)NULL);
+            execlp("/repo_elaborato/bin/park_assist.out", "park_assist.out", mode, (char *)NULL);
 
             // Se execlp restituisce, c'è stato un errore
             sprintf(log_msg, ERR_EXECLP, "park_assist.out");
@@ -295,10 +301,9 @@ void parking(int *speed, pid_t pids[4]) {
 
 /*
  * DESCRIPTION
+ * 
  *
  * PARAMETERS
- * 
- * RETURN VALUES
  * 
  */
 void handlerStart(int signum) 
@@ -313,8 +318,6 @@ void handlerStart(int signum)
  * DESCRIPTION
  *
  * PARAMETERS
- * 
- * RETURN VALUES
  * 
  */
 void handlerParking(int signum) 
@@ -336,8 +339,6 @@ void handlerParking(int signum)
  * DESCRIPTION
  *
  * PARAMETERS
- * 
- * RETURN VALUES
  * 
  */
 void handlerStop(int signum) 
