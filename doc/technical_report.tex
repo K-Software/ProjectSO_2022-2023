@@ -1,0 +1,100 @@
+\documentclass[12pt]{article}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage[latin1]{inputenc}
+\usepackage{listings}
+\usepackage{xcolor}
+
+\title{Progetto SISTEMI OPERATIVI 2022-2023}
+\author{Simone Cappabianca - Mat: 5423306 \\  simone.cappabianca@edu.unifi.it}
+\date{Dicembre 31, 2023}
+
+\setlength{\parindent}{4em}
+\setlength{\parskip}{1em}
+
+\begin{document}
+\maketitle
+\newpage
+
+\tableofcontents
+\newpage
+
+\section{Istruzioni per la compilazione e esecusione}
+Tutti i comandi sottostanti vanno eseguti dalla directory del progetto. \\
+Per l'installazione del progetto \`{e} necessario eseguire i seguenti comandi:
+\begin{enumerate}
+    \item \texttt{make all}
+    \item \texttt{make install}
+\end{enumerate}
+Per disinstallare il progetto \`{e} necessario eseguire il comando:
+\begin{enumerate}
+    \item \texttt{make uninstall}
+\end{enumerate}
+Per eseguire il progetto \`{e} necessario aprire una prima shell ed eseguire il
+comando con l'opzione di lancio che desideriamo (\texttt{NORMALE}/\texttt{ARTIFICIALE}):
+\begin{enumerate}
+    \item \texttt{./bin/ecu.out "OPZIONE-DI-LANCIO"}
+\end{enumerate}
+In una seconda shell \`{e} necessario eseguire il comando:
+\begin{enumerate}
+    \item \texttt{./bin/hmi\_output.out}
+\end{enumerate}
+
+\section{Sistema obiettivo}
+
+\section{Elementi facoltativi}
+
+\begin{tabular}{|p{0.1\textwidth}|p{0.4\textwidth}|p{0.2\textwidth}|p{0.4\textwidth}|}
+    \hline
+    \textbf{\#} & \textbf{Elemento Facoltativo} & \textbf{Realizzato (SI/NO)} & \textbf{Metodo o file principale}\\
+    \hline
+    \textbf{1} &
+    Ad ogni accelerazione, c'\`{e} una probabilit\`{a} di $10^{-5}$ che l'acceleratore 
+    fallisca. In tal caso, il componente throttle control invia un segnalealla 
+    Central ECU per evidenziare tale evento, e la Central ECU avvia la procedura 
+    di ARRESTO & \textbf{NO} &  \\
+    \hline
+    \textbf{2} & Componente "forward facing radar" & \textbf{NO} & \\
+    \hline
+    \textbf{3} &
+    Quando si attiva l'interazione con park assist,la Central ECU sospende (o 
+    rimuove) tutti i sensori e attuatori, tranne park assist e surround view 
+    cameras. & \textbf{NO} & \\
+    \hline
+    \textbf{4} &
+    Il componente Park assist non \`{e} generato all'avvio del Sistema, ma creato 
+    dalla Central ECU al bisogno. & \textbf{SI} &  \\
+    \hline
+\end{tabular}
+
+\newpage
+
+\begin{tabular}{|p{0.1\textwidth}|p{0.4\textwidth}|p{0.2\textwidth}|p{0.4\textwidth}|}
+    \hline
+    \textbf{5} &
+    Se il componente surround view cameras \`{e} implementato, park assist 
+    trasmette a Central ECU anche i byte ricevuti da surround view cameras. &
+    \textbf{NO} & \\
+    \hline
+    \textbf{6} & Componente "surround view cameras" & \textbf{NO} & \\
+    \hline
+    \textbf{7} &
+    Il comando di PARCHEGGIO potrebbe arrivare mentre i vari attuatori stanno 
+    eseguendo ulteriori comandi (accelerare o sterzare). I vari attuatori 
+    interrompono le loro azioni, per avviare le procedure di parcheggio. &
+    \textbf{NO} & \\
+    \hline
+    \textbf{8} &
+    Se la Central ECU riceve il segnale di fallimento accelerazione da "throttle 
+    control", imposta la velocit\`{a} a 0 e invia all'output della HMI un messaggio 
+    di totale terminazione dell'esecuzione. & \textbf{NO} & \\
+    \hline
+\end{tabular}
+
+\section{Progettazione e implementazione}
+
+\section{Esecuzione}
+
+\end{document}
