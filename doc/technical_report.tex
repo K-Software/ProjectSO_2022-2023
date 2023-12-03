@@ -43,6 +43,7 @@ In una seconda shell \`{e} necessario eseguire il comando:
 \end{enumerate}
 
 \section{Sistema obiettivo}
+Il progetto \`{e} stato sviluppato sulla distribuzione linux {\bf Ubuntu 22.04 LTS}.
 
 \section{Elementi facoltativi}
 
@@ -67,34 +68,74 @@ In una seconda shell \`{e} necessario eseguire il comando:
     Il componente Park assist non \`{e} generato all'avvio del Sistema, ma creato 
     dalla Central ECU al bisogno. & \textbf{SI} &  \\
     \hline
-\end{tabular}
-
-\newpage
-
-\begin{tabular}{|p{0.1\textwidth}|p{0.4\textwidth}|p{0.2\textwidth}|p{0.4\textwidth}|}
-    \hline
     \textbf{5} &
     Se il componente surround view cameras \`{e} implementato, park assist 
     trasmette a Central ECU anche i byte ricevuti da surround view cameras. &
     \textbf{NO} & \\
     \hline
-    \textbf{6} & Componente "surround view cameras" & \textbf{NO} & \\
-    \hline
-    \textbf{7} &
-    Il comando di PARCHEGGIO potrebbe arrivare mentre i vari attuatori stanno 
-    eseguendo ulteriori comandi (accelerare o sterzare). I vari attuatori 
-    interrompono le loro azioni, per avviare le procedure di parcheggio. &
-    \textbf{NO} & \\
-    \hline
-    \textbf{8} &
-    Se la Central ECU riceve il segnale di fallimento accelerazione da "throttle 
-    control", imposta la velocit\`{a} a 0 e invia all'output della HMI un messaggio 
-    di totale terminazione dell'esecuzione. & \textbf{NO} & \\
-    \hline
 \end{tabular}
 
-\section{Progettazione e implementazione}
+\begin{flushleft}
+    \begin{tabular}{|p{0.1\textwidth}|p{0.4\textwidth}|p{0.2\textwidth}|p{0.4\textwidth}|}
+        \hline
+        \textbf{6} & Componente "surround view cameras" & \textbf{NO} & \\
+        \hline
+        \textbf{7} &
+        Il comando di PARCHEGGIO potrebbe arrivare mentre i vari attuatori stanno 
+        eseguendo ulteriori comandi (accelerare o sterzare). I vari attuatori 
+        interrompono le loro azioni, per avviare le procedure di parcheggio. &
+        \textbf{NO} & \\
+        \hline
+        \textbf{8} &
+        Se la Central ECU riceve il segnale di fallimento accelerazione da "throttle 
+        control", imposta la velocit\`{a} a 0 e invia all'output della HMI un 
+        messaggio di totale terminazione dell'esecuzione. & \textbf{NO} & \\
+        \hline
+    \end{tabular}    
+\end{flushleft}
 
+\section{Progettazione e implementazione}
+Le scelte implementativi per la realizzazione del progetto sono le seguenti:
+\begin{itemize}
+    \item il componente {\bf Central ECU} di occupa di generare i processi dei 
+    componenti necessari per esecuzione ad esclusione dell'output della Human-Machine 
+    Interface;
+    \item la {\bf Human-Machine Interface} \`{e} stata divisa in due processi 
+    distinti uno relativo all'input e uno relativo all'output. 
+\end{itemize}
+Nello specifico il {\bf Central ECU} genera i processi dei seguenti componenti:
+\begin{enumerate}
+    \item {\bf front windshield camera};
+    \item {\bf steer-by-wire};
+    \item {\bf throttle control};
+    \item {\bf brake-by-wire};
+    \item {\bf Human-Machine interface} (input);
+    \item {\bf park assit}.
+\end{enumerate}
+Mentre i processi dei primi 5 componeti vengono generati al momento dell'avvio 
+della {\bf Central ECU}, il componente {\bf park assist} viene creato quando 
+{\bf Central ECU} riceve il comando {\it PARCHEGGIO}. 
+
+Per quando riguarda la comunicazione tra i processi \`{e} stato utilizzato un 
+socket di tipo FIFO nei seguenti casi:
+\begin{itemize}
+    \item {\bf front windshield camera} $\to$ {\bf Central ECU};
+    \item {\bf Central ECU} $\to$ {\bf steer-by-wire};
+    \item {\bf Central ECU} $\to$ {\bf brake-by-wire};
+    \item {\bf Central ECU} $\to$ {\bf throttle control};
+    \item {\bf Central ECU} $\to$ {\bf Human-Machine Intervace output};
+    \item {\bf park assist} $\to$ {\bf Central ECU}.
+\end{itemize} 
+
+Sono stati usati i segnali invece nei seguenti casi:
+\begin{itemize}
+    \item {\bf Human-Machine Interface input} $\to$ {\bf Central ECU} per la 
+    gestione tutti i comandi in input ({\it INIZIO, PARCHEGGIO, ARRESTO});
+    \item {\bf Central ECU} $\to$ {\bf brake-by-wire} per la gestione del comando 
+    {\it ARRESTO}
+    \item  {\bf Central ECU} $\to$ {\bf brake-by-wire} per la gestione del comando 
+    {\it PERICOLO}
+\end{itemize}
 \section{Esecuzione}
 
 \end{document}
