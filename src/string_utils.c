@@ -192,10 +192,11 @@ int getSubStr(char *source, char *target,int from, int to)
  * RETURN VALUES
  *
  */
-int isStringInArray(const char *target, const char *array[], int size)
+int isStringInArray(const char *string, const char *subStrings[], int size)
 {
   for (int i = 0; i < size; ++i) {
-    if (strcmp(target, array[i]) == 0) {
+    char *position = strstr(string, subStrings[i]);
+    if (position != NULL) {
       return 1; // La stringa è stata trovata nell'array
     }
   }

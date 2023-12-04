@@ -74,15 +74,14 @@ void parkAssistStart(char *mode)
             } else {
 
                 // Log di dati letti
-                for (int j = 0; j < sizeof(buffer); j += 2) {
-                    char log_msg[MAX_ROW_LEN_LOG];
-                    sprintf(log_msg, "0x%02X%02X", buffer[j], buffer[j + 1]);
-                    sendDataToECUComponent(socketECU, log_msg);
-                    addLog(PA_LOG_FILE_NAME, log_msg);
-                    usleep(250000);
-                }
+                char log_msg[MAX_ROW_LEN_LOG];
+                sprintf(log_msg, "0x%02X%02X%02X%02X%02X%02X%02X%02X", 
+                    buffer[0], buffer[1], buffer[2], buffer[3], buffer[4],
+                    buffer[5], buffer[6], buffer[7]);
+                sendDataToECUComponent(socketECU, log_msg);
+                addLog(PA_LOG_FILE_NAME, log_msg);
             }
-            //sleep(1);
+            sleep(1);
         }
         // Chiudi il file descriptor
         close(fd);

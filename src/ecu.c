@@ -276,10 +276,11 @@ void parking(int *speed, pid_t pids[4]) {
             // Se execlp restituisce, c'è stato un errore
             sprintf(log_msg, ERR_EXECLP, "park_assist.out");
             addLog(ECU_DEBUG_FILE_NAME, log_msg);
+            sleep(1);
         }
 
         int fd = socketOpenReadMode(PROCESS_NAME, socketECU);
-        for (int i = 0; i < 120; i++) {
+        for (int i = 0; i < 30; i++) {
             char data[PA_MSG_LEN] = "";
             socketReadData(PROCESS_NAME, fd, socketECU, data);
             sprintf(log_msg, DATA_PARKING, data);
@@ -288,7 +289,7 @@ void parking(int *speed, pid_t pids[4]) {
                 addLog(ECU_DEBUG_FILE_NAME, ERR_PARKING);
                 repeatParking = 1;
             }
-            usleep(250000);
+            sleep(1);
         }
         socketClose(PROCESS_NAME, fd, socketECU);
         kill(parkAssistPid, SIGTERM);
