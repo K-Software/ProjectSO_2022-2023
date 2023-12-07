@@ -33,7 +33,7 @@
 
 /*
  * DESCRIPTION:
- * This function function open a socket O_WRONLY and O_NONBLOCK mode.
+ * This function open a new socket O_WRONLY and O_NONBLOCK mode.
  * 
  * PARAMETERS:
  * - processName = name of process that open the new socket 
@@ -60,12 +60,15 @@ int socketOpenWriteMode(char *processName, char *socketName)
 }
 
 /*
- * DESCRIPTION
+ * DESCRIPTION:
+ * This function open a new socket O_RDONLY and O_NONBLOCK mode.
  *
- * PARAMETERS
+ * PARAMETERS:
+ * - processName = name of process that open the new socket 
+ * - socketName = name of the new socket 
  * 
- * RETURN VALUES
- * 
+ * RETURN VALUES:
+ * Return the file descriptor of the new socket
  */
 int socketOpenReadMode(char *processName, char *socketName)
 {
@@ -85,12 +88,18 @@ int socketOpenReadMode(char *processName, char *socketName)
 }
 
 /*
- * DESCRIPTION
+ * DESCRIPTION:
+ * This function write data on socket.
  *
- * PARAMETERS
+ * PARAMETERS:
+ * - processName = name of process that writes data on socket
+ * - fd = file descriptor of socket
+ * - socketName = name of socket
+ * - data = data to write on socket
  * 
  * RETURN VALUES
- * 
+ * - 0 = All right
+ * - 1 = Error during the write data on socket
  */
 int socketWriteData(char *processName, int fd, char *socketName, char *data) 
 {
@@ -109,12 +118,18 @@ int socketWriteData(char *processName, int fd, char *socketName, char *data)
 }
 
 /*
- * DESCRIPTION
+ * DESCRIPTION:
+ * This function read data from socket.
  *
- * PARAMETERS
+ * PARAMETERS:
+ * - processName = name of process that reads data from socket
+ * - fd = file descriptor of socket
+ * - socketName = name of socket
+ * - data = data read from socket
  * 
- * RETURN VALUES
- * 
+ * RETURN VALUES:
+ * - 0 = All right
+ * - 1 = Error during the read data from socket 
  */
 int socketReadData(char *processName, int fd, char *socketName, char *data)
 {
@@ -139,12 +154,14 @@ int socketReadData(char *processName, int fd, char *socketName, char *data)
 }
 
 /*
- * DESCRIPTION
+ * DESCRIPTION:
+ * This function close the socket.
  *
- * PARAMETERS
+ * PARAMETERS:
  * 
- * RETURN VALUES
- * 
+ * RETURN VALUES:
+ * - 0 = All right
+ * - 1 = Error during the closing socket
  */
 int socketClose(char *processName, int fd, char *socketName)
 {
