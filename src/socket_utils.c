@@ -32,12 +32,15 @@
 /* -------------------------------------------------------------------------- */
 
 /*
- * DESCRIPTION
- *
- * PARAMETERS
+ * DESCRIPTION:
+ * This function function open a socket O_WRONLY and O_NONBLOCK mode.
  * 
- * RETURN VALUES
+ * PARAMETERS:
+ * - processName = name of process that open the new socket 
+ * - socketName = name of the new socket
  * 
+ * RETURN VALUES:
+ * Return the file descriptor of the new socket
  */
 int socketOpenWriteMode(char *processName, char *socketName) 
 {
