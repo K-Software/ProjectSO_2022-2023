@@ -45,13 +45,12 @@ void main(void) {
 #endif
 
 /*
- * DESCRIPTION
- * This function build the full name of socket
+ * DESCRIPTION:
+ * This function builds the full name of socket
  *
- * PARAMETERS
- * 
- * RETURN VALUES
- * 
+ * PARAMETERS:
+ * - fullSocketName = full name of socket
+ * - socketName = name of socket 
  */
 void buildFullSocketName(char *fullSocketName, char *socketName) {
     strcpy(fullSocketName, PATH_SOCKET);
@@ -60,72 +59,67 @@ void buildFullSocketName(char *fullSocketName, char *socketName) {
 }
 
 /*
- * DESCRIPTION
+ * DESCRIPTION:
+ * This function builds the full name of socket for HMI output process.
  *
- * PARAMETERS
- * 
- * RETURN VALUES
- * 
+ * PARAMETERS:
+ * - fullSocketName = full name of socket
  */
 void buildHMIOutputSocketName(char *fullSocketName) {
     buildFullSocketName(fullSocketName, HMI_OUTPUT_SOCKET);
 }
 
 /*
- * DESCRIPTION
+ * DESCRIPTION:
+ * This function builds the full name of socket for ECU process.
  *
- * PARAMETERS
- * 
- * RETURN VALUES
- * 
+ * PARAMETERS:
+ * - fullSocketName = full name of socket
  */
 void buildECUSocketName(char *fullSocketName) {
     buildFullSocketName(fullSocketName, ECU_SOCKET);
 }
 
 /*
- * DESCRIPTION
+ * DESCRIPTION:
+ * This function builds the full name of socket for front windshield camera 
+ * process.
  *
- * PARAMETERS
- * 
- * RETURN VALUES
- * 
+ * PARAMETERS:
+ * - fullSocketName = full name of socket
  */
 void buildFWCSocketName(char *fullSocketName) {
     buildFullSocketName(fullSocketName, FWC_SOCKET);
 }
 
 /*
- * DESCRIPTION
+ * DESCRIPTION:
+ * This function builds the full name of socket for steer by wire process.
  *
- * PARAMETERS
- * 
- * RETURN VALUES
- * 
+ * PARAMETERS:
+ * - fullSocketName = full name of socket
  */
 void buildSBWSocketName(char *fullSocketName) {
     buildFullSocketName(fullSocketName, SBW_SOCKET);
 }
 
 /*
- * DESCRIPTION
+ * DESCRIPTION:
+ * This function builds the full name of socket for throttle control process.
  *
- * PARAMETERS
- * 
- * RETURN VALUES
- * 
+ * PARAMETERS:
+ * - fullSocketName = full name of socket
  */
 void buildTCSocketName(char *fullSocketName) {
     buildFullSocketName(fullSocketName, TC_SOCKET);
 }
 
 /*
- * DESCRIPTION
+ * DESCRIPTION:
+ * This function builds the full name of socket for brake by wire process.
  *
- * PARAMETERS
- * 
- * RETURN VALUES
- * 
+ * PARAMETERS:
+ * - fullSocketName = full name of socket
  */
 void buildBBWSocketName(char *fullSocketName) {
     buildFullSocketName(fullSocketName, BBW_SOCKET);
@@ -186,19 +180,23 @@ int getSubStr(char *source, char *target,int from, int to)
 
 /*
  * DESCRIPTION
+ * This functions checks if the string contains at least one strings. 
  *
  * PARAMETERS
+ * - string = string 
+ * - subStrings = list of sub strings
  *
  * RETURN VALUES
- *
+ * - 0 = the string not contains substrings
+ * - 1 = the string contains at least one substring
  */
 int isStringInArray(const char *string, const char *subStrings[], int size)
 {
   for (int i = 0; i < size; ++i) {
     char *position = strstr(string, subStrings[i]);
     if (position != NULL) {
-      return 1; // La stringa è stata trovata nell'array
+      return 1;
     }
   }
-  return 0; // La stringa non è stata trovata nell'array
+  return 0;
 }
