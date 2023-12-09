@@ -33,12 +33,8 @@ void main(void)
 } 
 
 /*
- * DESCRIPTION
- *
- * PARAMETERS
- * 
- * RETURN VALUES
- * 
+ * DESCRIPTION:
+ * This function executes the commands “DESTRA”, “SINISTRA”.
  */
 void steerByWireStart(void) 
 {
