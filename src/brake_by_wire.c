@@ -10,7 +10,7 @@
 #include <sys/socket.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <sys/un.h> /* For AF_UNIX sockets */
+#include <sys/un.h>                                /* For AF_UNIX sockets */
 #include <unistd.h>
 #include "common.h"
 #include "log.h"
@@ -35,12 +35,8 @@ void main(void)
 } 
 
 /*
- * DESCRIPTION
- *
- * PARAMETERS
- * 
- * RETURN VALUES
- * 
+ * DESCRIPTION:
+ * This function executes the command "FRENO 5".
  */
 void brakeByWireStart(void) 
 {
@@ -65,6 +61,13 @@ void brakeByWireStart(void)
     }
 }
 
+/*
+ * DESCRIPTION:
+ * this function overwrite the handler for signal SIGALRM. 
+ *
+ * PARAMETERS:
+ * - signum = signal number
+ */
 void handlerArresto(int signum) {
     addLog(BBW_LOG_FILE_NAME, BBW_STOP_MSG);
 }
