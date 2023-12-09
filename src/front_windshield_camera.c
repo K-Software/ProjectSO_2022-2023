@@ -30,6 +30,15 @@ int main(void)
     frontWindshieldCameraStart();
 }
 
+/*
+ * DESCRIPTION:
+ * This function reads data from front windshield camera and sends data to 
+ * Central ECU component.
+ *
+ * RETURN VALUES:
+ * - 0 = everything's ok
+ * - 1 = Error during opening file of data
+ */
 int frontWindshieldCameraStart(void) 
 {
     // Dichiaro un puntatore a FILE
@@ -66,6 +75,14 @@ int frontWindshieldCameraStart(void)
     return 0;
 }
 
+/*
+ * DESCRIPTION:
+ * This function sends data to socket.
+ *
+ * PARAMETERS:
+ * - socketName = name of socket
+ * - data = data to send
+ */
 void sendData(char *socketName, char *data)
 {
     int fd = socketOpenWriteMode(PROCESS_NAME, socketName);
