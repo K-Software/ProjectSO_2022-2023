@@ -52,15 +52,10 @@ int main(int argc, char *argv[])
 }
 
 /*
- * DESCRIPTION
- * This
- *
- * PARAMETERS
- * 
- * RETURN VALUES
- * 
+ * DESCRIPTION:
+ * This function realizies the Central ECU component.
  */
-void ecuStart()
+void ecuStart(void)
 {
     char prevCommand[FWC_MSG_LEN] = "";
     char log_msg[MAX_ROW_LEN_LOG];
@@ -181,12 +176,9 @@ void ecuStart()
 }
 
 /*
- * DESCRIPTION
- *
- * PARAMETERS
- * 
- * RETURN VALUES
- * 
+ * DESCRIPTION:
+ * This function creates all the sockets necessary for the "Central ECU" 
+ * component.
  */
 void initSockets(void) 
 {
@@ -222,12 +214,12 @@ void initSockets(void)
 }
 
 /*
- * DESCRIPTION
+ * DESCRIPTION:
+ * This function sends data to socket.
  *
- * PARAMETERS
- * 
- * RETURN VALUES
- * 
+ * PARAMETERS:
+ * - socketName = name of socket
+ * - data = data to send
  */
 void sendDataToComponent(char *socketName, char *command)
 {
@@ -236,12 +228,12 @@ void sendDataToComponent(char *socketName, char *command)
 }
 
 /*
- * DESCRIPTION
+ * DESCRIPTION:
+ * This function performs the parking action.
  *
- * PARAMETERS
- * 
- * RETURN VALUES
- * 
+ * PARAMETERS:
+ * - speed = current speed
+ * - pids = array with pids of components
  */
 void parking(int *speed, pid_t pids[4]) {
     char log_msg[MAX_ROW_LEN_LOG];
@@ -301,11 +293,11 @@ void parking(int *speed, pid_t pids[4]) {
 }
 
 /*
- * DESCRIPTION
- * 
+ * DESCRIPTION:
+ * this function overwrite the handler for signal SIGUSR1. 
  *
- * PARAMETERS
- * 
+ * PARAMETERS:
+ * - signum = signal number
  */
 void handlerStart(int signum) 
 {
@@ -316,10 +308,11 @@ void handlerStart(int signum)
 }
 
 /*
- * DESCRIPTION
+ * DESCRIPTION:
+ * this function overwrite the handler for signal SIGUSR2. 
  *
- * PARAMETERS
- * 
+ * PARAMETERS:
+ * - signum = signal number
  */
 void handlerParking(int signum) 
 {
@@ -337,10 +330,11 @@ void handlerParking(int signum)
 }
 
 /*
- * DESCRIPTION
+ * DESCRIPTION:
+ * this function overwrite the handler for signal SIGALRM. 
  *
- * PARAMETERS
- * 
+ * PARAMETERS:
+ * - signum = signal number
  */
 void handlerStop(int signum) 
 {
