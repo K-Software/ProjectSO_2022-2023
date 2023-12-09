@@ -138,7 +138,72 @@ Sono stati usati i segnali invece nei seguenti casi:
 \end{itemize}
 
 \section{Esecuzione}
+Dai logs in appendice si pu\`{o} evincere il momento preciso in cui \`{e} iniziata 
+l'eseguzione come viene indicato da questo log:  
+\begin{enumerate}
+    \item \texttt{[20231209-18:43:52:278]:50} ({\bf Front windshield camera} logs).
+\end{enumerate}
+Il comando {\it INIZIO} \`{e} arrivato solo 7 secondi dopo come si pu\`{o} vedere
+da questo log:
+\begin{enumerate}
+    \item \texttt{[20231209-18:43:59:301]:INCREMENTO 5} ({\bf Central ECU} logs).
+\end{enumerate}
+Questo primo incremento \`{e} stato seguito da altri 9 incrementi necessari a 
+portare la velocit\`{a} da 0 a 50km/h come si pu\`{o} vedere da i seguenti logs:
+\begin{enumerate}
+    \item \texttt{[20231209-18:43:59:302]:INCREMENTO 5};
+    \item \texttt{[20231209-18:43:59:303]:INCREMENTO 5};
+    \item \texttt{[20231209-18:43:59:303]:INCREMENTO 5};
+    \item \texttt{[20231209-18:43:59:304]:INCREMENTO 5};
+    \item \texttt{[20231209-18:43:59:305]:INCREMENTO 5};
+    \item \texttt{[20231209-18:43:59:305]:INCREMENTO 5};
+    \item \texttt{[20231209-18:43:59:306]:INCREMENTO 5};
+    \item \texttt{[20231209-18:43:59:306]:INCREMENTO 5};
+    \item \texttt{[20231209-18:43:59:307]:INCREMENTO 5}.
+\end{enumerate}
+Questi 10 \texttt{INCREMETO 5} hanno generato come previsto altrettanti comandi 
+verso il {\bf Throttle control} come si pu\`{o} vedere dai logs:
+\begin{enumerate}
+    \item \texttt{[20231209-18:43:59:302]:AUMENTO 5} ({\bf Throttle control} logs);
+    \item \texttt{[20231209-18:43:59:303]:AUMENTO 5};
+    \item \texttt{[20231209-18:43:59:303]:AUMENTO 5};
+    \item \texttt{[20231209-18:43:59:304]:AUMENTO 5};
+    \item \texttt{[20231209-18:43:59:305]:AUMENTO 5};
+    \item \texttt{[20231209-18:43:59:305]:AUMENTO 5};
+    \item \texttt{[20231209-18:43:59:306]:AUMENTO 5};
+    \item \texttt{[20231209-18:43:59:307]:AUMENTO 5};
+    \item \texttt{[20231209-18:43:59:308]:AUMENTO 5};
+    \item \texttt{[20231209-18:43:59:309]:AUMENTO 5}.
+\end{enumerate}
+Questo ha permesso di portare la velocit\`{a} del veicolo da 0 a 50 km/h come 
+indicato dalla {\bf Front windshield camera}.
 
+Il successivo comando che ha genarato una azione \`{e} arrivato solo dopo 9 secondi
+come testimonia questo log:
+\begin{enumerate}
+    \item \texttt{[20231209-18:44:01:308]:DESTRA} ({\bf Front windshield camera} logs).
+\end{enumerate}
+
+A questo dato proveniente dalla {\bf Front windshield camera} come da specifiche 
+tecniche corrisponde l'invio del comamndo {\it DESTRA} da parte della 
+{\bf Central ECU} verso il componente {\bf Steer by wire} come si pu\`{o} vedere 
+dai seguenti logs:
+\begin{enumerate}
+    \item \texttt{[20231209-18:44:01:309]:DESTRA} ({\bf Central ECU} logs);
+    \item \texttt{[20231209-18:44:02:311]:STO GIRANDO A DESTRA} ({\bf Steer by wire} logs).
+\end{enumerate}
+
+\`{E} interessante notare dai logs sottostanti come il comando {\it DESTRA} \`{e}
+arrivato subito dopo il controllo da parte del componente {\bf Steer by wire}
+dell'arrivo di comando e per questo motivo ci sia stato un lag di 1 secondo. 
+Un'altra cosa che si pu\`{o} vedere dai log sostanti e che l'azione di girare a 
+destra ha una durata di 4 secondi come da specifiche.
+
+\begin{enumerate}
+    \item \texttt{[20231209-18:44:01:308]:NO ACTION} ({\bf Steer by wire} logs);
+    \item \texttt{[20231209-18:44:02:311]:STO GIRANDO A DESTRA};
+    \item \texttt{[20231209-18:44:06:312]:NO ACTION}.
+\end{enumerate}
 \section{Appendice A - Park assit logs}
 \begin{verbatim}
     [20231209-18:44:48:250]:0x397F54D1A560AAD2
@@ -193,7 +258,7 @@ Sono stati usati i segnali invece nei seguenti casi:
     [20231209-18:44:47:244]:FRENO 5
 \end{verbatim}
 
-\section{Appentice C - Front windshield camere logs}
+\section{Appentice C - Front windshield camera logs}
 \begin{verbatim}
     [20231209-18:43:52:278]:50
     [20231209-18:43:53:282]:50

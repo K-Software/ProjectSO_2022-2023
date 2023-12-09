@@ -3,9 +3,9 @@
 \contentsline {section}{\numberline {3}Elementi facoltativi}{4}{section.3}%
 \contentsline {section}{\numberline {4}Progettazione e implementazione}{5}{section.4}%
 \contentsline {section}{\numberline {5}Esecuzione}{7}{section.5}%
-\contentsline {section}{\numberline {6}Appendice A - Park assit logs}{7}{section.6}%
-\contentsline {section}{\numberline {7}Appendice B - Brake by wire logs}{8}{section.7}%
-\contentsline {section}{\numberline {8}Appentice C - Front windshield camere logs}{8}{section.8}%
-\contentsline {section}{\numberline {9}Appendice D - Central ECU logs}{11}{section.9}%
-\contentsline {section}{\numberline {10}Appendice E - Steer by wire logs}{12}{section.10}%
-\contentsline {section}{\numberline {11}Appendice F - Throttle control logs}{14}{section.11}%
+\contentsline {section}{\numberline {6}Appendice A - Park assit logs}{9}{section.6}%
+\contentsline {section}{\numberline {7}Appendice B - Brake by wire logs}{10}{section.7}%
+\contentsline {section}{\numberline {8}Appentice C - Front windshield camera logs}{10}{section.8}%
+\contentsline {section}{\numberline {9}Appendice D - Central ECU logs}{13}{section.9}%
+\contentsline {section}{\numberline {10}Appendice E - Steer by wire logs}{14}{section.10}%
+\contentsline {section}{\numberline {11}Appendice F - Throttle control logs}{16}{section.11}%
