@@ -31,7 +31,10 @@ void main(void)
     hmiOutputStart();
 }
 
-
+/*
+ * DESCRIPTION:
+ * This function shows the commands that Central ECU sends to other components
+ */
 int hmiOutputStart(void) 
 {
     char *socketName = malloc(strlen(PATH_SOCKET)+strlen(HMI_OUTPUT_SOCKET)+strlen(EXT_SOCKET)+1);
@@ -52,6 +55,10 @@ int hmiOutputStart(void)
     }
 }
 
+/*
+ * DESCRIPTION:
+ * This function create the fifo socket for HMI Output
+ */
 void initSockets(void)
 {
     // HMI Output socket
