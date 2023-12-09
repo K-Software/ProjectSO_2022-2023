@@ -33,7 +33,7 @@ void main(void)
 } 
 
 /*
- * DESCRIPTION:
+ * DESCRIPTION
  * This function executes the command “INCREMENTO 5”.
  */
 void throttleControlStart(void) 
