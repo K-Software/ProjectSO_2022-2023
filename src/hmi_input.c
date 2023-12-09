@@ -23,18 +23,15 @@
 
 void main() 
 {
-    hmiInputStrat();
+    hmiInputStart();
 }
 
 /*
  * DESCRIPTION
- *
- * PARAMETERS
- * 
- * RETURN VALUES
- * 
+ * This function sends input commands "INIZIO", "PARCHEGGIO" and "ARRESTO" to
+ * Central ECU component.
  */
-int hmiInputStrat(void) {
+void hmiInputStart(void) {
 
     // SIGUSR1 -> INIZIO
     // SIGUSR2 -> PARCHEGGIO
