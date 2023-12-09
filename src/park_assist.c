@@ -31,17 +31,14 @@ void main(int argc, char *argv[])
 }
 
 /*
- * DESCRIPTION
- *
- * PARAMETERS
+ * DESCRIPTION:
+ * This function executes the command "PARCHEGGIO".
  * 
- * RETURN VALUES
- * 
+ * PARAMETERS:
+ * - mode = this parameter indicates the source of data of component
  */
 void parkAssistStart(char *mode)
 {
-
-
     int fd = open("/dev/urandom", O_RDONLY);
     if (strcmp("ARTIFICIALE", mode) == 0) {
         fd = open(ARTIFICIALE_FILE_NAME, O_RDONLY);
@@ -59,7 +56,7 @@ void parkAssistStart(char *mode)
         char *socketECU = malloc(strlen(PATH_SOCKET)+strlen(ECU_SOCKET)+strlen(EXT_SOCKET)+1);
         buildECUSocketName(socketECU);
 
-        for (int i = 0; i < 120; i++) {
+        for (int i = 0; i < 30; i++) {
             // Buffer per contenere i 8 byte letti
             unsigned char buffer[8];
 
@@ -78,17 +75,26 @@ void parkAssistStart(char *mode)
                 sprintf(log_msg, "0x%02X%02X%02X%02X%02X%02X%02X%02X", 
                     buffer[0], buffer[1], buffer[2], buffer[3], buffer[4],
                     buffer[5], buffer[6], buffer[7]);
-                sendDataToECUComponent(socketECU, log_msg);
+                sendData(socketECU, log_msg);
                 addLog(PA_LOG_FILE_NAME, log_msg);
             }
             sleep(1);
         }
         // Chiudi il file descriptor
         close(fd);
+        free(socketECU);
     }
 }
 
-void sendDataToECUComponent(char *socketName, char *command)
+/*
+ * DESCRIPTION:
+ * This function sends data to socket.
+ *
+ * PARAMETERS:
+ * - socketName = name of socket
+ * - data = data to send
+ */
+void sendData(char *socketName, char *command)
 {
     int fd = socketOpenWriteMode(PROCESS_NAME, socketName);
     socketWriteData(PROCESS_NAME, fd, socketName, command);
