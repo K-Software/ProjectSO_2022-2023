@@ -237,7 +237,7 @@ void sendDataToComponent(char *socketName, char *command)
  */
 void parking(int *speed, pid_t pids[4]) {
     char log_msg[MAX_ROW_LEN_LOG];
-    const char *parkingCodeError[] = {"0x172A", "0xD693", "0x0000", "0xBDD8", "0xFAEE", "0x4300"}; 
+    const char *parkingCodeError[] = {"172A", "D693", "0000", "BDD8", "FAEE", "4300"}; 
 
     char *socketBBW = malloc(strlen(PATH_SOCKET)+strlen(BBW_SOCKET)+strlen(EXT_SOCKET)+1);
     buildBBWSocketName(socketBBW);
