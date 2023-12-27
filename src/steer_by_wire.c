@@ -14,7 +14,7 @@
 #include <unistd.h>
 #include "common.h"
 #include "log.h"
-#include "socket_utils.h"
+#include "pipe_utils.h"
 #include "steer_by_wire.h"
 #include "string_utils.h"
 
@@ -38,14 +38,14 @@ void main(void)
  */
 void steerByWireStart(void) 
 {
-    char *socketName = malloc(strlen(PATH_SOCKET)+strlen(SBW_SOCKET)+strlen(EXT_SOCKET)+1);
-    buildSBWSocketName(socketName);
+    char *pipeName = malloc(strlen(PATH_PIPE)+strlen(SBW_PIPE)+strlen(EXT_PIPE)+1);
+    buildSBWPipeName(pipeName);
 
-    int fd = socketOpenReadMode(PROCESS_NAME, socketName);
+    int fd = pipeOpenReadMode(PROCESS_NAME, pipeName);
     while(1) {
         char log_msg[MAX_ROW_LEN_LOG];
         char command[SBW_MSG_LEN] = "";
-        socketReadData(PROCESS_NAME, fd, socketName, command);
+        pipeReadData(PROCESS_NAME, fd, pipeName, command);
         if (strlen(command) != 0) {
             if (strcmp(command, ECU_COMMAND_RIGHT) == 0) {
                 addLog(SBW_LOG_FILE_NAME, SBW_TURN_RIGHT_LOG_MSG);

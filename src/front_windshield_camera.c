@@ -10,7 +10,7 @@
 #include "common.h"
 #include "front_windshield_camera.h"
 #include "log.h"
-#include "socket_utils.h"
+#include "pipe_utils.h"
 #include "string_utils.h"
 
 /* -------------------------------------------------------------------------- */
@@ -54,38 +54,36 @@ int frontWindshieldCameraStart(void)
     }
     addLog(FWC_DEBUG_FILE_NAME, OPEN_DATA_FILE_OK);
 
-    char *socketName = malloc(strlen(PATH_SOCKET)+strlen(FWC_SOCKET)+strlen(EXT_SOCKET)+1);
-    buildFWCSocketName(socketName);
-
-    // mkfifo(socketName, 0666);
+    char *pipeName = malloc(strlen(PATH_PIPE)+strlen(FWC_PIPE)+strlen(EXT_PIPE)+1);
+    buildFWCPipeName(pipeName);
 
     // Leggere e stampare il contenuto del file riga per riga
     char data[FWC_MSG_LEN];  // Una stringa temporanea per leggere ciascuna riga
     while (fgets(data, sizeof(data), frontCameraData) != NULL) {
         // Write data in FIFO
-        sendData(socketName, data);
+        sendData(pipeName, data);
         addLog(FWC_LOG_FILE_NAME, data);
         sleep(1);
     }
 
     // Chiudere il file dopo aver terminato la lettura
     fclose(frontCameraData);
-    free(socketName);
+    free(pipeName);
 
     return 0;
 }
 
 /*
  * DESCRIPTION:
- * This function sends data to socket.
+ * This function sends data to pipe.
  *
  * PARAMETERS:
- * - socketName = name of socket
+ * - pipeName = name of pipe
  * - data = data to send
  */
-void sendData(char *socketName, char *data)
+void sendData(char *pipeName, char *data)
 {
-    int fd = socketOpenWriteMode(PROCESS_NAME, socketName);
-    socketWriteData(PROCESS_NAME, fd, socketName, data);
-    socketClose(PROCESS_NAME, fd, socketName);
+    int fd = pipeOpenWriteMode(PROCESS_NAME, pipeName);
+    pipeWriteData(PROCESS_NAME, fd, pipeName, data);
+    pipeClose(PROCESS_NAME, fd, pipeName);
 }

@@ -14,7 +14,7 @@
 #include <unistd.h>
 #include "common.h"
 #include "log.h"
-#include "socket_utils.h"
+#include "pipe_utils.h"
 #include "string_utils.h"
 #include "throttle_control.h"
 
@@ -38,14 +38,14 @@ void main(void)
  */
 void throttleControlStart(void) 
 {
-    char *socketName = malloc(strlen(PATH_SOCKET)+strlen(TC_SOCKET)+strlen(EXT_SOCKET)+1);
-    buildTCSocketName(socketName);
+    char *pipeName = malloc(strlen(PATH_PIPE)+strlen(TC_PIPE)+strlen(EXT_PIPE)+1);
+    buildTCPipeName(pipeName);
 
-    int fd = socketOpenReadMode(PROCESS_NAME, socketName);
+    int fd = pipeOpenReadMode(PROCESS_NAME, pipeName);
     while(1) {
         char log_msg[MAX_ROW_LEN_LOG];
         char command[TC_MSG_LEN] = "";
-        socketReadData(PROCESS_NAME, fd, socketName, command);
+        pipeReadData(PROCESS_NAME, fd, pipeName, command);
         if (strlen(command) > 0) {
             if (strcmp(command, ECU_COMMAND_THROTTLE) == 0) {
                 addLog(TC_LOG_FILE_NAME, TC_LOG_MSG);

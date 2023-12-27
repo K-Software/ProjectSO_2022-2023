@@ -46,83 +46,83 @@ void main(void) {
 
 /*
  * DESCRIPTION:
- * This function builds the full name of socket
+ * This function builds the full name of pipe
  *
  * PARAMETERS:
- * - fullSocketName = full name of socket
- * - socketName = name of socket 
+ * - fullPipeName = full name of pipe
+ * - pipeName = name of pipe 
  */
-void buildFullSocketName(char *fullSocketName, char *socketName) {
-    strcpy(fullSocketName, PATH_SOCKET);
-    strcat(fullSocketName, socketName);
-    strcat(fullSocketName, EXT_SOCKET);
+void buildFullPipeName(char *fullPipeName, char *pipeName) {
+    strcpy(fullPipeName, PATH_PIPE);
+    strcat(fullPipeName, pipeName);
+    strcat(fullPipeName, EXT_PIPE);
 }
 
 /*
  * DESCRIPTION:
- * This function builds the full name of socket for HMI output process.
+ * This function builds the full name of pipe for HMI output process.
  *
  * PARAMETERS:
- * - fullSocketName = full name of socket
+ * - fullPipeName = full name of pipe
  */
-void buildHMIOutputSocketName(char *fullSocketName) {
-    buildFullSocketName(fullSocketName, HMI_OUTPUT_SOCKET);
+void buildHMIOutputPipeName(char *fullPipeName) {
+    buildFullPipeName(fullPipeName, HMI_OUTPUT_PIPE);
 }
 
 /*
  * DESCRIPTION:
- * This function builds the full name of socket for ECU process.
+ * This function builds the full name of pipe for ECU process.
  *
  * PARAMETERS:
- * - fullSocketName = full name of socket
+ * - fullPipeName = full name of pipe
  */
-void buildECUSocketName(char *fullSocketName) {
-    buildFullSocketName(fullSocketName, ECU_SOCKET);
+void buildECUPipeName(char *fullPipeName) {
+    buildFullPipeName(fullPipeName, ECU_PIPE);
 }
 
 /*
  * DESCRIPTION:
- * This function builds the full name of socket for front windshield camera 
+ * This function builds the full name of pipe for front windshield camera 
  * process.
  *
  * PARAMETERS:
- * - fullSocketName = full name of socket
+ * - fullPipeName = full name of pipe
  */
-void buildFWCSocketName(char *fullSocketName) {
-    buildFullSocketName(fullSocketName, FWC_SOCKET);
+void buildFWCPipeName(char *fullPipeName) {
+    buildFullPipeName(fullPipeName, FWC_PIPE);
 }
 
 /*
  * DESCRIPTION:
- * This function builds the full name of socket for steer by wire process.
+ * This function builds the full name of pipe for steer by wire process.
  *
  * PARAMETERS:
- * - fullSocketName = full name of socket
+ * - fullPipeName = full name of pipe
  */
-void buildSBWSocketName(char *fullSocketName) {
-    buildFullSocketName(fullSocketName, SBW_SOCKET);
+void buildSBWPipeName(char *fullPipeName) {
+    buildFullPipeName(fullPipeName, SBW_PIPE);
 }
 
 /*
  * DESCRIPTION:
- * This function builds the full name of socket for throttle control process.
+ * This function builds the full name of pipe for throttle control process.
  *
  * PARAMETERS:
- * - fullSocketName = full name of socket
+ * - fullPipeName = full name of pipe
  */
-void buildTCSocketName(char *fullSocketName) {
-    buildFullSocketName(fullSocketName, TC_SOCKET);
+void buildTCPipeName(char *fullPipeName) {
+    buildFullPipeName(fullPipeName, TC_PIPE);
 }
 
 /*
  * DESCRIPTION:
- * This function builds the full name of socket for brake by wire process.
+ * This function builds the full name of pipe for brake by wire process.
  *
  * PARAMETERS:
- * - fullSocketName = full name of socket
+ * - fullPipeName = full name of pipe
  */
-void buildBBWSocketName(char *fullSocketName) {
-    buildFullSocketName(fullSocketName, BBW_SOCKET);
+void buildBBWPipeName(char *fullPipeName) {
+    buildFullPipeName(fullPipeName, BBW_PIPE);
 }
 
 /*

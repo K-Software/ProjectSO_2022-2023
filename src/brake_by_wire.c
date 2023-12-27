@@ -10,12 +10,12 @@
 #include <sys/socket.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <sys/un.h>                                /* For AF_UNIX sockets */
+#include <sys/un.h>
 #include <unistd.h>
 #include "common.h"
 #include "log.h"
 #include "brake_by_wire.h"
-#include "socket_utils.h"
+#include "pipe_utils.h"
 #include "string_utils.h"
 
 /* -------------------------------------------------------------------------- */
@@ -40,14 +40,14 @@ void main(void)
  */
 void brakeByWireStart(void) 
 {
-    char *socketName = malloc(strlen(PATH_SOCKET)+strlen(BBW_SOCKET)+strlen(EXT_SOCKET)+1);
-    buildBBWSocketName(socketName);
+    char *pipeName = malloc(strlen(PATH_PIPE)+strlen(BBW_PIPE)+strlen(EXT_PIPE)+1);
+    buildBBWPipeName(pipeName);
 
-    int fd = socketOpenReadMode(PROCESS_NAME, socketName);
+    int fd = pipeOpenReadMode(PROCESS_NAME, pipeName);
     while(1) {
         char log_msg[MAX_ROW_LEN_LOG];
         char command[BBW_MSG_LEN] = "";
-        socketReadData(PROCESS_NAME, fd, socketName, command);
+        pipeReadData(PROCESS_NAME, fd, pipeName, command);
         if (strlen(command) > 0) {
             if (strcmp(command, ECU_COMMAND_BRAKE) == 0) {
                 addLog(BBW_LOG_FILE_NAME, BBW_BRAKE_MSG);

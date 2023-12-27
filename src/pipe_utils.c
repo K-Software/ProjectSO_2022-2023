@@ -1,5 +1,5 @@
 /* -------------------------------------------------------------------------- */
-/* socket_utils.h                                                             */
+/* pipe_utils.h                                                               */
 /* -------------------------------------------------------------------------- */
 #include <errno.h>
 #include <fcntl.h>
@@ -11,7 +11,7 @@
 #include <unistd.h>
 #include "common.h"
 #include "log.h"
-#include "socket_utils.h"
+#include "pipe_utils.h"
 
 /* -------------------------------------------------------------------------- */
 /* Macro                                                                      */
@@ -33,105 +33,105 @@
 
 /*
  * DESCRIPTION:
- * This function open a new socket O_WRONLY and O_NONBLOCK mode.
+ * This function open a new pipe O_WRONLY and O_NONBLOCK mode.
  * 
  * PARAMETERS:
- * - processName = name of process that open the new socket 
- * - socketName = name of the new socket
+ * - processName = name of process that open the new pipe 
+ * - pipeName = name of the new pipe
  * 
  * RETURN VALUES:
- * Return the file descriptor of the new socket
+ * Return the file descriptor of the new pipe
  */
-int socketOpenWriteMode(char *processName, char *socketName) 
+int pipeOpenWriteMode(char *processName, char *pipeName) 
 {
     int fd;
     char log_msg[MAX_ROW_LEN_LOG];
 
-    fd = open(socketName, O_WRONLY | O_NONBLOCK);
+    fd = open(pipeName, O_WRONLY | O_NONBLOCK);
 
     if (fd == -1) {
-        sprintf(log_msg, OPEN_W_ERR_MSG, processName, socketName, errno);
-        socketAddLog(log_msg);
+        sprintf(log_msg, OPEN_W_ERR_MSG, processName, pipeName, errno);
+        pipeAddLog(log_msg);
         return -1;
     }
-    sprintf(log_msg, OPEN_W_OK_MSG, processName, socketName);
-    socketAddLog(log_msg);
+    sprintf(log_msg, OPEN_W_OK_MSG, processName, pipeName);
+    pipeAddLog(log_msg);
     return fd;
 }
 
 /*
  * DESCRIPTION:
- * This function open a new socket O_RDONLY and O_NONBLOCK mode.
+ * This function open a new pipe O_RDONLY and O_NONBLOCK mode.
  *
  * PARAMETERS:
- * - processName = name of process that open the new socket 
- * - socketName = name of the new socket 
+ * - processName = name of process that open the new pipe 
+ * - pipeName = name of the new pipe 
  * 
  * RETURN VALUES:
- * Return the file descriptor of the new socket
+ * Return the file descriptor of the new pipe
  */
-int socketOpenReadMode(char *processName, char *socketName)
+int pipeOpenReadMode(char *processName, char *pipeName)
 {
     int fd;
     char log_msg[MAX_ROW_LEN_LOG];
 
-    fd = open(socketName, O_RDONLY | O_NONBLOCK);
+    fd = open(pipeName, O_RDONLY | O_NONBLOCK);
 
     if (fd == -1) {
-        sprintf(log_msg, OPEN_R_ERR_MSG, processName, socketName, errno);
-        socketAddLog(log_msg);
+        sprintf(log_msg, OPEN_R_ERR_MSG, processName, pipeName, errno);
+        pipeAddLog(log_msg);
         return -1;
     }
-    sprintf(log_msg, OPEN_R_OK_MSG, processName, socketName);
-    socketAddLog(log_msg);
+    sprintf(log_msg, OPEN_R_OK_MSG, processName, pipeName);
+    pipeAddLog(log_msg);
     return fd;
 }
 
 /*
  * DESCRIPTION:
- * This function write data on socket.
+ * This function write data on pipe.
  *
  * PARAMETERS:
- * - processName = name of process that writes data on socket
- * - fd = file descriptor of socket
- * - socketName = name of socket
- * - data = data to write on socket
+ * - processName = name of process that writes data on pipe
+ * - fd = file descriptor of pipe
+ * - pipeName = name of pipe
+ * - data = data to write on pipe
  * 
  * RETURN VALUES
  * - 0 = All right
  * - 1 = Error during the write data on socket
  */
-int socketWriteData(char *processName, int fd, char *socketName, char *data) 
+int pipeWriteData(char *processName, int fd, char *pipeName, char *data) 
 {
     char log_msg[MAX_ROW_LEN_LOG];
 
     ssize_t writedBytes = write(fd, data, strlen(data));
     
     if (writedBytes == -1) {
-        sprintf(log_msg, WRITE_ERR_MSG, processName, socketName, errno);
-        socketAddLog(log_msg);
+        sprintf(log_msg, WRITE_ERR_MSG, processName, pipeName, errno);
+        pipeAddLog(log_msg);
         return 1;
     } 
-    sprintf(log_msg, WRITE_OK_MSG, processName, socketName, data);
-    socketAddLog(log_msg);
+    sprintf(log_msg, WRITE_OK_MSG, processName, pipeName, data);
+    pipeAddLog(log_msg);
     return 0;
 }
 
 /*
  * DESCRIPTION:
- * This function read data from socket.
+ * This function read data from pipe.
  *
  * PARAMETERS:
- * - processName = name of process that reads data from socket
- * - fd = file descriptor of socket
- * - socketName = name of socket
- * - data = data read from socket
+ * - processName = name of process that reads data from pipe
+ * - fd = file descriptor of pipe
+ * - pipeName = name of pipe
+ * - data = data read from pipe
  * 
  * RETURN VALUES:
  * - 0 = All right
- * - 1 = Error during the read data from socket 
+ * - 1 = Error during the read data from pipe 
  */
-int socketReadData(char *processName, int fd, char *socketName, char *data)
+int pipeReadData(char *processName, int fd, char *pipeName, char *data)
 {
     char log_msg[MAX_ROW_LEN_LOG];
     ssize_t readBytes;
@@ -140,7 +140,7 @@ int socketReadData(char *processName, int fd, char *socketName, char *data)
         readBytes = read(fd, data + totalBytesRead, 1);
 
         if (readBytes == -1) {
-            sprintf(log_msg, READ_ERR_MSG, processName, socketName, errno);
+            sprintf(log_msg, READ_ERR_MSG, processName, pipeName, errno);
             return 1;
         } 
 
@@ -148,39 +148,42 @@ int socketReadData(char *processName, int fd, char *socketName, char *data)
 
     } while (readBytes > 0 && data[totalBytesRead - 1] != '\0');
     data[totalBytesRead - 1] = '\0';
-    sprintf(log_msg, READ_OK_MSG, processName, socketName, data);
-    socketAddLog(log_msg);    
+    sprintf(log_msg, READ_OK_MSG, processName, pipeName, data);
+    pipeAddLog(log_msg);    
     return 0;
 }
 
 /*
  * DESCRIPTION:
- * This function close the socket.
+ * This function close the pipe.
  *
  * PARAMETERS:
+ * - processName = name of process that reads data from pipe
+ * - fd = file descriptor of pipe
+ * - pipeName = name of pipe
  * 
  * RETURN VALUES:
  * - 0 = All right
  * - 1 = Error during the closing socket
  */
-int socketClose(char *processName, int fd, char *socketName)
+int pipeClose(char *processName, int fd, char *pipeName)
 {
     char log_msg[MAX_ROW_LEN_LOG];
     int res = close(fd);
     
     if (res == -1) {
-        sprintf(log_msg, CLOSE_ERR_MSG, processName, socketName, errno);
-        socketAddLog(log_msg);
+        sprintf(log_msg, CLOSE_ERR_MSG, processName, pipeName, errno);
+        pipeAddLog(log_msg);
         return 1;
     }
-    sprintf(log_msg, CLOSE_OK_MSG, processName, socketName);
-    socketAddLog(log_msg);
+    sprintf(log_msg, CLOSE_OK_MSG, processName, pipeName);
+    pipeAddLog(log_msg);
     return 0;
 }
 
-void socketAddLog(char *msg)
+void pipeAddLog(char *msg)
 {
-    #ifdef DEBUG_SOCKET_UTILS
-    addLog(SOCKET_UTILS_LOG, msg);
+    #ifdef DEBUG_PIPE_UTILS
+    addLog(PIPE_UTILS_LOG, msg);
     #endif
 }

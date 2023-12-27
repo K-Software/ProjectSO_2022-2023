@@ -17,7 +17,7 @@
 #include "common.h"
 #include "ecu.h"
 #include "log.h"
-#include "socket_utils.h"
+#include "pipe_utils.h"
 #include "string_utils.h"
 
 /* -------------------------------------------------------------------------- */
@@ -62,7 +62,7 @@ void ecuStart(void)
     sprintf(log_msg, "Mode: %s", mode);
     addLog(ECU_DEBUG_FILE_NAME, log_msg);
 
-    initSockets();
+    initPipes();
 
     const char *paths[] = {"/repo_elaborato/bin/front_windshield_camera.out", 
         "/repo_elaborato/bin/steer_by_wire.out",
@@ -93,30 +93,30 @@ void ecuStart(void)
     }    
 
     /* ECU */
-    char *socketFWC = malloc(strlen(PATH_SOCKET)+strlen(FWC_SOCKET)+strlen(EXT_SOCKET)+1);
-    buildFWCSocketName(socketFWC);
+    char *pipeFWC = malloc(strlen(PATH_PIPE)+strlen(FWC_PIPE)+strlen(EXT_PIPE)+1);
+    buildFWCPipeName(pipeFWC);
 
-    char *socketSBW = malloc(strlen(PATH_SOCKET)+strlen(SBW_SOCKET)+strlen(EXT_SOCKET)+1);
-    buildSBWSocketName(socketSBW);
+    char *pipeSBW = malloc(strlen(PATH_PIPE)+strlen(SBW_PIPE)+strlen(EXT_PIPE)+1);
+    buildSBWPipeName(pipeSBW);
 
-    char *socketTC = malloc(strlen(PATH_SOCKET)+strlen(TC_SOCKET)+strlen(EXT_SOCKET)+1);
-    buildTCSocketName(socketTC);
+    char *pipeTC = malloc(strlen(PATH_PIPE)+strlen(TC_PIPE)+strlen(EXT_PIPE)+1);
+    buildTCPipeName(pipeTC);
 
-    char *socketBBW = malloc(strlen(PATH_SOCKET)+strlen(BBW_SOCKET)+strlen(EXT_SOCKET)+1);
-    buildBBWSocketName(socketBBW);
+    char *pipeBBW = malloc(strlen(PATH_PIPE)+strlen(BBW_PIPE)+strlen(EXT_PIPE)+1);
+    buildBBWPipeName(pipeBBW);
 
-    char *socketHMIOutput = malloc(strlen(PATH_SOCKET)+strlen(HMI_OUTPUT_SOCKET)+strlen(EXT_SOCKET)+1);
-    buildHMIOutputSocketName(socketHMIOutput);
+    char *pipeHMIOutput = malloc(strlen(PATH_PIPE)+strlen(HMI_OUTPUT_PIPE)+strlen(EXT_PIPE)+1);
+    buildHMIOutputPipeName(pipeHMIOutput);
 
     while (start == 0) {
         addLog(ECU_DEBUG_FILE_NAME, "OFF");
         sleep(1);
     }
 
-    int fd = socketOpenReadMode(PROCESS_NAME, socketFWC);
+    int fd = pipeOpenReadMode(PROCESS_NAME, pipeFWC);
     while (1) {
         char command[FWC_MSG_LEN] = "";
-        socketReadData(PROCESS_NAME, fd, socketFWC, command);
+        pipeReadData(PROCESS_NAME, fd, pipeFWC, command);
 
         // Parser commando
         if (strlen(command) == 0) {
@@ -131,34 +131,34 @@ void ecuStart(void)
 
         if (strcmp(FWC_COMMAND_LEFT, command) == 0) {
             addLog(ECU_LOG_FILE_NAME, ECU_COMMAND_LEFT);
-            sendDataToComponent(socketSBW, ECU_COMMAND_LEFT);
-            sendDataToComponent(socketHMIOutput, ECU_COMMAND_LEFT);
+            sendDataToComponent(pipeSBW, ECU_COMMAND_LEFT);
+            sendDataToComponent(pipeHMIOutput, ECU_COMMAND_LEFT);
         } else if (strcmp(FWC_COMMAND_RIGHT, command) == 0) {
             addLog(ECU_LOG_FILE_NAME, ECU_COMMAND_RIGHT);
-            sendDataToComponent(socketSBW, ECU_COMMAND_RIGHT);
-            sendDataToComponent(socketHMIOutput, ECU_COMMAND_RIGHT);
+            sendDataToComponent(pipeSBW, ECU_COMMAND_RIGHT);
+            sendDataToComponent(pipeHMIOutput, ECU_COMMAND_RIGHT);
         } else if (strcmp(FWC_COMMAND_PARKING, command) == 0) {
             addLog(ECU_LOG_FILE_NAME, ECU_PARKING);
-            sendDataToComponent(socketHMIOutput, ECU_PARKING);
+            sendDataToComponent(pipeHMIOutput, ECU_PARKING);
             parking(&speed, pids);
         } else if (strcmp(FWC_COMMAND_DANGER, command) == 0) {
             kill(pids[3], SIGALRM);
             addLog(ECU_LOG_FILE_NAME, ECU_STOP);
-            sendDataToComponent(socketHMIOutput, ECU_STOP);
+            sendDataToComponent(pipeHMIOutput, ECU_STOP);
             speed = 0;
         } else {
             int temp = atoi(command);
             if (temp > speed) {
                 for (; speed < temp; speed += 5) {
                     addLog(ECU_LOG_FILE_NAME, ECU_COMMAND_THROTTLE);
-                    sendDataToComponent(socketHMIOutput, ECU_COMMAND_THROTTLE);
-                    sendDataToComponent(socketTC, ECU_COMMAND_THROTTLE);
+                    sendDataToComponent(pipeHMIOutput, ECU_COMMAND_THROTTLE);
+                    sendDataToComponent(pipeTC, ECU_COMMAND_THROTTLE);
                 }
             } else if (speed > temp) {
                 for (; speed > temp; speed -= 5) {
                     addLog(ECU_LOG_FILE_NAME, ECU_COMMAND_BRAKE);
-                    sendDataToComponent(socketBBW, ECU_COMMAND_BRAKE);
-                    sendDataToComponent(socketHMIOutput, ECU_COMMAND_BRAKE);
+                    sendDataToComponent(pipeBBW, ECU_COMMAND_BRAKE);
+                    sendDataToComponent(pipeHMIOutput, ECU_COMMAND_BRAKE);
                 }
             }
         }
@@ -168,63 +168,63 @@ void ecuStart(void)
         sleep(1);
     }
     
-    socketClose(PROCESS_NAME, fd, socketFWC);
-    free(socketBBW);
-    free(socketTC);
-    free(socketSBW);
-    free(socketFWC);
+    pipeClose(PROCESS_NAME, fd, pipeFWC);
+    free(pipeBBW);
+    free(pipeTC);
+    free(pipeSBW);
+    free(pipeFWC);
 }
 
 /*
  * DESCRIPTION:
- * This function creates all the sockets necessary for the "Central ECU" 
+ * This function creates all the pipes necessary for the "Central ECU" 
  * component.
  */
-void initSockets(void) 
+void initPipes(void) 
 {
-    // ECO socket
-    char *socketECU = malloc(strlen(PATH_SOCKET)+strlen(ECU_SOCKET)+strlen(EXT_SOCKET)+1);
-    buildECUSocketName(socketECU);
-    mkfifo(socketECU, 0666);
-    free(socketECU);
+    // ECO pipe
+    char *pipeECU = malloc(strlen(PATH_PIPE)+strlen(ECU_PIPE)+strlen(EXT_PIPE)+1);
+    buildECUPipeName(pipeECU);
+    mkfifo(pipeECU, 0666);
+    free(pipeECU);
 
-    // Front windshield camera socket
-    char *socketFWC = malloc(strlen(PATH_SOCKET)+strlen(FWC_SOCKET)+strlen(EXT_SOCKET)+1);
-    buildFWCSocketName(socketFWC);
-    mkfifo(socketFWC, 0666);
-    free(socketFWC);
+    // Front windshield camera pipe
+    char *pipeFWC = malloc(strlen(PATH_PIPE)+strlen(FWC_PIPE)+strlen(EXT_PIPE)+1);
+    buildFWCPipeName(pipeFWC);
+    mkfifo(pipeFWC, 0666);
+    free(pipeFWC);
 
-    // Steer by wire socket
-    char *socketSBW = malloc(strlen(PATH_SOCKET)+strlen(SBW_SOCKET)+strlen(EXT_SOCKET)+1);
-    buildSBWSocketName(socketSBW);
-    mkfifo(socketSBW, 0666);
-    free(socketSBW);
+    // Steer by wire pipe
+    char *pipeSBW = malloc(strlen(PATH_PIPE)+strlen(SBW_PIPE)+strlen(EXT_PIPE)+1);
+    buildSBWPipeName(pipeSBW);
+    mkfifo(pipeSBW, 0666);
+    free(pipeSBW);
 
-    // Throttle control socket
-    char *socketTC = malloc(strlen(PATH_SOCKET)+strlen(TC_SOCKET)+strlen(EXT_SOCKET)+1);
-    buildTCSocketName(socketTC);
-    mkfifo(socketTC, 0666);
-    free(socketTC);
+    // Throttle control pipe
+    char *pipeTC = malloc(strlen(PATH_PIPE)+strlen(TC_PIPE)+strlen(EXT_PIPE)+1);
+    buildTCPipeName(pipeTC);
+    mkfifo(pipeTC, 0666);
+    free(pipeTC);
 
-    // Brake by wire socket
-    char *socketBBW = malloc(strlen(PATH_SOCKET)+strlen(BBW_SOCKET)+strlen(EXT_SOCKET)+1);
-    buildBBWSocketName(socketBBW);
-    mkfifo(socketBBW, 0666);
-    free(socketBBW);
+    // Brake by wire pipe
+    char *pipeBBW = malloc(strlen(PATH_PIPE)+strlen(BBW_PIPE)+strlen(EXT_PIPE)+1);
+    buildBBWPipeName(pipeBBW);
+    mkfifo(pipeBBW, 0666);
+    free(pipeBBW);
 }
 
 /*
  * DESCRIPTION:
- * This function sends data to socket.
+ * This function sends data to pipe.
  *
  * PARAMETERS:
- * - socketName = name of socket
+ * - pipeName = name of pipe
  * - data = data to send
  */
-void sendDataToComponent(char *socketName, char *command)
+void sendDataToComponent(char *pipeName, char *command)
 {
-    int fd = socketOpenWriteMode(PROCESS_NAME, socketName);
-    socketWriteData(PROCESS_NAME, fd, socketName, command);
+    int fd = pipeOpenWriteMode(PROCESS_NAME, pipeName);
+    pipeWriteData(PROCESS_NAME, fd, pipeName, command);
 }
 
 /*
@@ -239,15 +239,15 @@ void parking(int *speed, pid_t pids[4]) {
     char log_msg[MAX_ROW_LEN_LOG];
     const char *parkingCodeError[] = {"172A", "D693", "0000", "BDD8", "FAEE", "4300"}; 
 
-    char *socketBBW = malloc(strlen(PATH_SOCKET)+strlen(BBW_SOCKET)+strlen(EXT_SOCKET)+1);
-    buildBBWSocketName(socketBBW);
+    char *pipeBBW = malloc(strlen(PATH_PIPE)+strlen(BBW_PIPE)+strlen(EXT_PIPE)+1);
+    buildBBWPipeName(pipeBBW);
 
-    char *socketECU = malloc(strlen(PATH_SOCKET)+strlen(ECU_SOCKET)+strlen(EXT_SOCKET)+1);
-    buildECUSocketName(socketECU);
+    char *pipeECU = malloc(strlen(PATH_PIPE)+strlen(ECU_PIPE)+strlen(EXT_PIPE)+1);
+    buildECUPipeName(pipeECU);
 
     // Azzero la velocita`
     for (; *speed > 0; *speed -= 5) {
-        sendDataToComponent(socketBBW, ECU_COMMAND_BRAKE);
+        sendDataToComponent(pipeBBW, ECU_COMMAND_BRAKE);
         sleep(1);
     }
 
@@ -271,10 +271,10 @@ void parking(int *speed, pid_t pids[4]) {
             sleep(1);
         }
 
-        int fd = socketOpenReadMode(PROCESS_NAME, socketECU);
+        int fd = pipeOpenReadMode(PROCESS_NAME, pipeECU);
         for (int i = 0; i < 30; i++) {
             char data[PA_MSG_LEN] = "";
-            socketReadData(PROCESS_NAME, fd, socketECU, data);
+            pipeReadData(PROCESS_NAME, fd, pipeECU, data);
             sprintf(log_msg, DATA_PARKING, data);
             addLog(ECU_DEBUG_FILE_NAME, log_msg);
             if (isStringInArray(data, parkingCodeError, 6)) {
@@ -283,7 +283,7 @@ void parking(int *speed, pid_t pids[4]) {
             }
             sleep(1);
         }
-        socketClose(PROCESS_NAME, fd, socketECU);
+        pipeClose(PROCESS_NAME, fd, pipeECU);
         kill(parkAssistPid, SIGTERM);
     }
     for (int i = 0; i < 4; i++) {
@@ -317,16 +317,16 @@ void handlerStart(int signum)
 void handlerParking(int signum) 
 {
     char log_msg[MAX_ROW_LEN_LOG];
-    char *socketHMIOutput = malloc(strlen(PATH_SOCKET)+strlen(HMI_OUTPUT_SOCKET)+strlen(EXT_SOCKET)+1);
-    buildHMIOutputSocketName(socketHMIOutput);
+    char *pipeHMIOutput = malloc(strlen(PATH_PIPE)+strlen(HMI_OUTPUT_PIPE)+strlen(EXT_PIPE)+1);
+    buildHMIOutputPipeName(pipeHMIOutput);
 
     sprintf(log_msg, "HMI INPUT: %s", HMI_INPUT_COMMAND_PARKING);
     addLog(ECU_DEBUG_FILE_NAME, log_msg);
     addLog(ECU_LOG_FILE_NAME, ECU_PARKING);
-    sendDataToComponent(socketHMIOutput, ECU_PARKING);
+    sendDataToComponent(pipeHMIOutput, ECU_PARKING);
     parking(&speed, pids);
 
-    free(socketHMIOutput);
+    free(pipeHMIOutput);
 }
 
 /*
@@ -339,16 +339,16 @@ void handlerParking(int signum)
 void handlerStop(int signum) 
 {
     char log_msg[MAX_ROW_LEN_LOG];
-    char *socketHMIOutput = malloc(strlen(PATH_SOCKET)+strlen(HMI_OUTPUT_SOCKET)+strlen(EXT_SOCKET)+1);
-    buildHMIOutputSocketName(socketHMIOutput);
+    char *pipeHMIOutput = malloc(strlen(PATH_PIPE)+strlen(HMI_OUTPUT_PIPE)+strlen(EXT_PIPE)+1);
+    buildHMIOutputPipeName(pipeHMIOutput);
 
     sprintf(log_msg, "HMI INPUT: %s", HMI_INPUT_COMMAND_STOP);
     addLog(ECU_DEBUG_FILE_NAME, log_msg);
     kill(pids[3], SIGALRM);
     addLog(ECU_LOG_FILE_NAME, ECU_STOP);
-    sendDataToComponent(socketHMIOutput, ECU_STOP);
+    sendDataToComponent(pipeHMIOutput, ECU_STOP);
     speed = 0;
 
-    free(socketHMIOutput);
+    free(pipeHMIOutput);
 }
 

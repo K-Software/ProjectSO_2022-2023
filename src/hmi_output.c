@@ -14,7 +14,7 @@
 #include <unistd.h>
 #include "common.h"
 #include "hmi_output.h"
-#include "socket_utils.h"
+#include "pipe_utils.h"
 #include "string_utils.h"
 
 /* -------------------------------------------------------------------------- */
@@ -37,17 +37,17 @@ void main(void)
  */
 int hmiOutputStart(void) 
 {
-    char *socketName = malloc(strlen(PATH_SOCKET)+strlen(HMI_OUTPUT_SOCKET)+strlen(EXT_SOCKET)+1);
-    buildHMIOutputSocketName(socketName);
+    char *pipeName = malloc(strlen(PATH_PIPE)+strlen(HMI_OUTPUT_PIPE)+strlen(EXT_PIPE)+1);
+    buildHMIOutputPipeName(pipeName);
 
-    initSockets();
+    initPipes();
 
     printf("HMI OUTPUT\n");    
-    int fd = socketOpenReadMode(PROCESS_NAME, socketName);
+    int fd = pipeOpenReadMode(PROCESS_NAME, pipeName);
     while(1) {
         char log_msg[MAX_ROW_LEN_LOG];
         char command[HMI_OUTPUT_MSG_LEM] = "";
-        socketReadData(PROCESS_NAME, fd, socketName, command);
+        pipeReadData(PROCESS_NAME, fd, pipeName, command);
         if (strlen(command) > 0) {
             printf(" -> %s\n", command);
         }
@@ -57,13 +57,13 @@ int hmiOutputStart(void)
 
 /*
  * DESCRIPTION:
- * This function create the fifo socket for HMI Output
+ * This function create the fifo pipe for HMI Output
  */
-void initSockets(void)
+void initPipes(void)
 {
-    // HMI Output socket
-    char *socketHMIOutput = malloc(strlen(PATH_SOCKET)+strlen(HMI_OUTPUT_SOCKET)+strlen(EXT_SOCKET)+1);
-    buildHMIOutputSocketName(socketHMIOutput);
-    mkfifo(socketHMIOutput, 0666);
-    free(socketHMIOutput);
+    // HMI Output pipe
+    char *pipeHMIOutput = malloc(strlen(PATH_PIPE)+strlen(HMI_OUTPUT_PIPE)+strlen(EXT_PIPE)+1);
+    buildHMIOutputPipeName(pipeHMIOutput);
+    mkfifo(pipeHMIOutput, 0666);
+    free(pipeHMIOutput);
 }

@@ -2,4 +2,4 @@
 /* hmi_output.c                                                               */
 /* -------------------------------------------------------------------------- */
 int hmiOutputStart(void);
-void initSockets(void);
+void initPipes(void);
